@@ -1,0 +1,1 @@
+<div id="sidebar-nav"> <span ng-repeat="v in sidebar.views" class="ed-btn ed-nav-btn" ng-click="sidebar.go(v.state)" ng-class="{active: sidebar.state === v.state}"> <i class="fa fa-{{v.icon}}"></i> </span> <span class="ed-btn" id="hide-sidebar" ng-click="sidebar.toggleVisible()"> <i class="fa fa-angle-double-left"></i> </span> </div> <div id="sidebar-list" ui-view></div>
