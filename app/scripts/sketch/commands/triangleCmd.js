@@ -4,13 +4,19 @@
 
 angular.module('geomeditApp')
   .run(['board', 'motion', function(bd, motion) {
-    function addCommand(id, type, attr) {
+    function addCommand(id, maxcount, indexes) {
 
       function downHandler() {
         if (!motion.hasDraftCoords()) {
           motion.addDraftCoords();
           motion.addDraftCoords();
-          bd.drafts.push(bd.create(type, motion.createDraftPoints(0, 1), attr));
+          bd.drafts.push(bd.create('polygon', motion.createDraftPoints(indexes)));
+        }
+        else if (motion.lastDraftCoordsIsNew()) {
+          motion.addDraftCoords();
+          if (motion.lastDraftCoordsIsNew() && motion.draftCoordsCount() < maxcount) {
+            motion.addDraftCoords();
+          }
         }
         else {
           motion.setDraftCoords();
@@ -18,9 +24,9 @@ angular.module('geomeditApp')
       }
 
       function upHandler() {
-        if (motion.lastDraftCoordsIsNew()) {
+        if (motion.draftCoordsCount() === maxcount && motion.lastDraftCoordsIsNew()) {
           motion.submit(function() {
-            bd.create(type, motion.createPoints(), attr);
+            bd.create('polygon', motion.createPoints());
           });
         }
       }
@@ -32,8 +38,7 @@ angular.module('geomeditApp')
       });
     }
 
-    addCommand('segment', 'segment');
-    addCommand('ray', 'line', { straightFirst: false });
-    addCommand('line', 'line');
+    addCommand('triangle', 3, [0, 1, 2]);
+    addCommand('quadrangle', 4, [0, 1, 2, 3]);
 
   }]);

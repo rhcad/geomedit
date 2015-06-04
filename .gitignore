@@ -12,3 +12,10 @@ node_modules/
 bower_components/
 .sass-cache/
 dist/
+
+# WebStorm Files
+.idea/
+
+# Xcode Files
+xcshareddata
+xcuserdata

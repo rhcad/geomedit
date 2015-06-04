@@ -9,7 +9,10 @@ angular.module('geomeditApp')
     this.items = function() {
       if (!cmdTitles || cmdTitles.length !== board.commands.length) {
         cmdTitles = board.commands.map(function(cmd) {
-          return { id: cmd.id, title: cmd.title };
+          var title = ('Cmd_' + cmd.id).replace(/_(.)/g, function(match, letter) {
+            return letter.toUpperCase();
+          });
+          return { id: cmd.id, title: title };
         });
       }
       return cmdTitles;
@@ -24,7 +27,7 @@ angular.module('geomeditApp')
       if (board.command) {
         (board.command.cancelled || angular.noop)();
         board.command = null;
-        motion.clearDraft();
+        motion.clearDrafts();
       }
       return changed;
     };
@@ -36,7 +39,7 @@ angular.module('geomeditApp')
 
       var changed = this.cancel();
 
-      board.command = find(id);
+      board.command = board.findCommand(id);
       if (board.command) {
         var res = (board.command.inited || angular.noop)();
         if (typeof res === 'boolean' && !res) {
@@ -49,15 +52,5 @@ angular.module('geomeditApp')
 
       return changed;
     };
-
-    function find(id) {
-      var ret = null;
-      board.commands.forEach(function(cmd) {
-        if (cmd.id === id) {
-          ret = cmd;
-        }
-      });
-      return ret;
-    }
 
   }]);

@@ -3,8 +3,9 @@
 'use strict';
 
 angular.module('geomeditApp')
-  .service('eventHandler', ['board', 'options', 'motion', function(board, options, motion) {
+  .service('eventHandler', ['board', 'options', 'motion', function(bd, options, motion) {
     var downEvent, upEvent, moveEvent;
+    this.touchMode = false;
 
     this.registerHandlers = function() {
       if (JXG.supportsPointerEvents()) {
@@ -20,7 +21,7 @@ angular.module('geomeditApp')
         }
         JXG.Options.device = 'msie';
       }
-      else if ((JXG.isTouchDevice() || JXG.isFirefoxOS()) && typeof Qt !== 'object') {
+      else if (JXG.isTouchDevice() || JXG.isFirefoxOS()) {
         downEvent = 'touchstart';
         upEvent = 'touchend';
         moveEvent = 'touchmove';
@@ -40,113 +41,120 @@ angular.module('geomeditApp')
         this.addMouseHandlers();
         this.addTouchHandlers();
       }
-      JXG.addEvent(board.board.containerObj, downEvent, this.downEventHandler, this);
-      JXG.addEvent(board.board.containerObj, moveEvent, this.moveEventHandler, this);
-      JXG.addEvent(board.board.containerObj, upEvent, this.upEventHandler, this);
+      JXG.addEvent(bd.board.containerObj, downEvent, this.downEventHandler, this);
+      JXG.addEvent(bd.board.containerObj, moveEvent, this.moveEventHandler, this);
+      JXG.addEvent(bd.board.containerObj, upEvent, this.upEventHandler, this);
     };
 
     this.unregisterHandlers = function() {
       this.removePointerHandlers();
       this.removeMouseHandlers();
       this.removeTouchHandlers();
-      JXG.removeEvent(board.board.containerObj, downEvent, this.downEventHandler, this);
-      JXG.removeEvent(board.board.containerObj, moveEvent, this.moveEventHandler, this);
-      JXG.removeEvent(board.board.containerObj, upEvent, this.upEventHandler, this);
+      JXG.removeEvent(bd.board.containerObj, downEvent, this.downEventHandler, this);
+      JXG.removeEvent(bd.board.containerObj, moveEvent, this.moveEventHandler, this);
+      JXG.removeEvent(bd.board.containerObj, upEvent, this.upEventHandler, this);
       motion.clear();
     };
 
     function preventDefault(e) { e.preventDefault(); }
 
     this.addPointerHandlers = function() {
-      if (window.navigator.pointerEnabled) {
-        JXG.addEvent(board.board.containerObj, 'pointermove', board.board.pointerMoveListener, board.board);
-      }
-      else {
-        JXG.addEvent(board.board.containerObj, 'MSPointerMove', board.board.pointerMoveListener, board.board);
-      }
+      if (!bd.board.hasPointerHandlers && JXG.isBrowser) {
+        JXG.addEvent(bd.board.containerObj, moveEvent, bd.board.pointerMoveListener, bd.board);
 
-      board.board.containerObj.addEventListener('MSHoldVisual', preventDefault, false);
-      board.board.containerObj.addEventListener('contextmenu', preventDefault, false);
-      board.board.containerObj.addEventListener('selectstart', preventDefault, false);
+        bd.board.containerObj.addEventListener('MSHoldVisual', preventDefault, false);
+        bd.board.containerObj.addEventListener('contextmenu', preventDefault, false);
+        bd.board.containerObj.addEventListener('selectstart', preventDefault, false);
 
-      this.jsxgraphDownHandler = function() {
-        return board.board.pointerDownListener.apply(board.board, arguments);
-      };
-      board.board.hasPointerHandlers = true;
+        this.jxgDownHandler = function() {
+          return bd.board.pointerDownListener.apply(bd.board, arguments);
+        };
+        bd.board.hasPointerHandlers = true;
+        this.touchMode = true;
+      }
     };
 
     this.addMouseHandlers = function() {
-      if (!board.board.hasMouseHandlers && JXG.isBrowser) {
-        JXG.addEvent(board.board.containerObj, 'mousemove', board.board.mouseMoveListener, board.board);
-        board.board.containerObj.addEventListener('contextmenu', preventDefault, false);
+      if (!bd.board.hasMouseHandlers && JXG.isBrowser) {
+        JXG.addEvent(bd.board.containerObj, 'mousemove', bd.board.mouseMoveListener, bd.board);
+        bd.board.containerObj.addEventListener('contextmenu', preventDefault, false);
 
-        this.jsxgraphDownHandler = function() {
-          board.board.mouseDownListener.apply(board.board, arguments);
+        this.jxgDownHandler = function() {
+          bd.board.mouseDownListener.apply(bd.board, arguments);
         };
-        board.board.hasMouseHandlers = true;
+        bd.board.hasMouseHandlers = true;
       }
     };
 
     this.addTouchHandlers = function() {
-      if (!board.board.hasTouchHandlers && JXG.isBrowser) {
-        JXG.addEvent(board.board.containerObj, 'touchmove', board.board.touchMoveListener, board.board);
-        board.board.hasTouchHandlers = true;
+      if (!bd.board.hasTouchHandlers && JXG.isBrowser) {
+        JXG.addEvent(bd.board.containerObj, 'touchmove', bd.board.touchMoveListener, bd.board);
+        bd.board.hasTouchHandlers = true;
       }
     };
 
     this.removePointerHandlers = function() {
-      if (board.board.hasPointerHandlers) {
-        if (window.navigator.pointerEnabled) {
-          JXG.removeEvent(board.board.containerObj, 'pointermove', board.board.pointerMoveListener, board.board);
-        }
-        else {
-          JXG.removeEvent(board.board.containerObj, 'MSPointerMove', board.board.pointerMoveListener, board.board);
-        }
-        board.board.hasPointerHandlers = false;
+      if (bd.board.hasPointerHandlers) {
+        JXG.removeEvent(bd.board.containerObj, moveEvent, bd.board.pointerMoveListener, bd.board);
+        bd.board.containerObj.removeEventListener('MSHoldVisual', preventDefault, false);
+        bd.board.containerObj.removeEventListener('contextmenu', preventDefault, false);
+        bd.board.containerObj.removeEventListener('selectstart', preventDefault, false);
+        bd.board.hasPointerHandlers = false;
       }
     };
 
     this.removeMouseHandlers = function() {
-      if (board.board.hasMouseHandlers) {
-        JXG.removeEvent(board.board.containerObj, 'mousemove', board.board.mouseMoveListener, board.board);
-        board.board.hasMouseHandlers = false;
+      if (bd.board.hasMouseHandlers) {
+        JXG.removeEvent(bd.board.containerObj, 'mousemove', bd.board.mouseMoveListener, bd.board);
+        bd.board.containerObj.removeEventListener('contextmenu', preventDefault, false);
+        bd.board.hasMouseHandlers = false;
       }
     };
 
     this.removeTouchHandlers = function() {
-      if (board.board.hasTouchHandlers) {
-        JXG.removeEvent(board.board.containerObj, 'touchmove', board.board.touchMoveListener, board.board);
-        board.board.hasTouchHandlers = false;
+      if (bd.board.hasTouchHandlers) {
+        JXG.removeEvent(bd.board.containerObj, 'touchmove', bd.board.touchMoveListener, bd.board);
+        bd.board.hasTouchHandlers = false;
       }
     };
 
     this.downEventHandler = function(e) {
-      if (board.board.hasMouseHandlers && e[JXG.touchProperty]) {
+      if (bd.board.hasMouseHandlers && e[JXG.touchProperty]) {
         this.removeMouseHandlers();
-        this.jsxgraphDownHandler = function() {
-          board.board.touchStartListener.apply(board.board, arguments);
+        this.jxgDownHandler = function() {
+          bd.board.touchStartListener.apply(bd.board, arguments);
         };
-        board.board.hasMouseHandlers = false;
+        bd.board.hasMouseHandlers = false;
+        this.touchMode = true;
+        bd.board.options.precision.hasPoint = bd.board.options.precision.touch;
       }
 
       motion.updateStartCoords(e);
       motion.dragging = true;
 
-      if (board.command) {
-        (board.command.downHandler || angular.noop)();
-        updateDraftCurves();
+      if (bd.command) {
+        (bd.command.downHandler || angular.noop)();
+        bd.board.update();
       }
-      else if (options.draggingMode) {
-        (this.jsxgraphDownHandler || angular.noop)(e);
+      else if (options.draggable) {
+        (this.jxgDownHandler || angular.noop)(e);
       }
     };
 
     this.moveEventHandler = function(e) {
       if (motion.dragging) {
+        if (this.touchMode) {
+          bd.board.options.precision.hasPoint = bd.board.options.precision.touch;
+        }
         motion.updateCoords(e);
-        if (board.command) {
-          (board.command.moveHandler || angular.noop)();
-          updateDraftCurves();
+        if (bd.command) {
+          if (bd.command.moveHandler) {
+            bd.command.moveHandler();
+          }
+          else if (motion.hasDraftCoords()) {
+            motion.setDraftCoords();
+          }
+          bd.board.update();
           motion.lastPt = motion.pt;
         }
       }
@@ -155,14 +163,10 @@ angular.module('geomeditApp')
     this.upEventHandler = function(e) {
       motion.updateCoords(e);
       motion.dragging = false;
-      if (board.command) {
-        (board.command.upHandler || angular.noop)();
-        updateDraftCurves();
+      if (bd.command) {
+        (bd.command.upHandler || angular.noop)();
+        bd.board.update();
       }
     };
-
-    function updateDraftCurves() {
-      board.board.update();
-    }
 
   }]);

@@ -3,36 +3,36 @@
 'use strict';
 
 angular.module('geomeditApp')
-  .service('boardService', ['board', 'eventHandler', function(board, eventHandler) {
+  .service('boardService', ['board', 'eventHandler', function(bd, eventHandler) {
 
     this.initBoard = function(id) {
-      board.board = JXG.JSXGraph.initBoard(id, board.initAttr);
-      board.board.moveOrigin(board.board.canvasWidth / 2, board.board.canvasHeight / 2);
-      JXG.Options = JXG.deepCopy(JXG.Options, board.initOptions);
+      bd.board = JXG.JSXGraph.initBoard(id, bd.initAttr);
+      bd.board.moveOrigin(bd.board.canvasWidth / 2, bd.board.canvasHeight / 2);
+      bd.board.options = JXG.deepCopy(bd.board.options, bd.initOptions);
       eventHandler.registerHandlers();
     };
 
     this.freeBoard = function() {
       var id;
-      if (board.board) {
-        id = board.board.containerObj.id;
+      if (bd.board) {
+        id = bd.board.containerObj.id;
         eventHandler.unregisterHandlers();
-        JXG.JSXGraph.freeBoard(board.board);
-        board.board = null;
+        JXG.JSXGraph.freeBoard(bd.board);
+        bd.board = null;
       }
       return id;
     };
 
     this.resizeBoard = function(w, h) {
-      if (board.board) {
-        if (!equals(board.board.canvasWidth, w) || !equals(board.board.canvasHeight, h)) {
-          var xcenter = equals(board.board.origin.scrCoords[1], board.board.canvasWidth / 2),
-              ycenter = equals(board.board.origin.scrCoords[2], board.board.canvasHeight / 2);
+      if (bd.board) {
+        if (!equals(bd.board.canvasWidth, w) || !equals(bd.board.canvasHeight, h)) {
+          var xcenter = equals(bd.board.origin.scrCoords[1], bd.board.canvasWidth / 2),
+              ycenter = equals(bd.board.origin.scrCoords[2], bd.board.canvasHeight / 2);
 
-          board.board.resizeContainer(w, h, false, true);
-          board.board.applyZoom();
+          bd.board.resizeContainer(w, h, false, true);
+          bd.board.applyZoom();
           if (xcenter && ycenter) {
-            board.board.moveOrigin(board.board.canvasWidth / 2, board.board.canvasHeight / 2);
+            bd.board.moveOrigin(bd.board.canvasWidth / 2, bd.board.canvasHeight / 2);
           }
         }
       }

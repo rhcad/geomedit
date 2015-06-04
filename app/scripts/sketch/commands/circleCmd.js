@@ -3,40 +3,63 @@
 'use strict';
 
 angular.module('geomeditApp')
-  .run(['board', 'motion', function(board, motion) {
+  .run(['board', 'motion', function(bd, motion) {
 
-    function downHandler() {
-      if (motion.pointCount() === 0) {
-        motion.addPoint();
-        motion.addPoint();
-        board.draft[0] = board.board.create('circumcircle', motion.pointWithIndexes(0, 1, 2));
+    (function() {
+      function downHandler() {
+        if (!motion.hasDraftCoords()) {
+          motion.addDraftCoords();
+          motion.addDraftCoords();
+          bd.drafts.push(bd.create('circumcircle', motion.createDraftPoints(0, 1, 2)));
+        }
+        else if (motion.lastDraftCoordsIsNew()) {
+          motion.addDraftCoords();
+        }
+        else {
+          motion.setDraftCoords();
+        }
       }
-      else if (motion.lastPointIsNew()) {
-        motion.addPoint();
-      }
-      else {
-        motion.setPoint();
-      }
-    }
 
-    function moveHandler() {
-      motion.setPoint();
-    }
-
-    function upHandler() {
-      if (motion.pointCount() === 3 && motion.lastPointIsNew()) {
-        motion.clearDraft();
-        board.board.create('circumcircle', motion.createPoints());
-        motion.clearPoints();
+      function upHandler() {
+        if (motion.draftCoordsCount() === 3 && motion.lastDraftCoordsIsNew()) {
+          motion.submit(function() {
+            bd.create('circumcircle', motion.createPoints());
+          });
+        }
       }
-    }
 
-    board.commands.push({
-      id:          'circle3p',
-      title:       'CmdCircle3',
-      downHandler: downHandler,
-      moveHandler: moveHandler,
-      upHandler:   upHandler
-    });
+      bd.addCommand({
+        id:          'circle3p',
+        downHandler: downHandler,
+        upHandler:   upHandler
+      });
+    }());
+
+    (function() {
+      function downHandler() {
+        if (!motion.hasDraftCoords()) {
+          motion.addDraftCoords();
+          motion.addDraftCoords();
+          bd.drafts.push(bd.create('circle', motion.createDraftPoints(0, 1)));
+        }
+        else {
+          motion.setDraftCoords();
+        }
+      }
+
+      function upHandler() {
+        if (motion.lastDraftCoordsIsNew()) {
+          motion.submit(function() {
+            bd.create('circle', motion.createPoints());
+          });
+        }
+      }
+
+      bd.addCommand({
+        id:          'circle2p',
+        downHandler: downHandler,
+        upHandler:   upHandler
+      });
+    }());
 
   }]);

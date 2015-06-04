@@ -2,8 +2,8 @@
 <html class="no-js">
   <head>
     <meta charset="utf-8">
-    <title>数学实验</title>
-    <meta name="description" content="基于动态几何的数学在线实验平台">
+    <title>Geometry Editor</title>
+    <meta name="description" content="Online geometry editor based on AngularJS and JSXGraph">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
 
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
@@ -48,7 +48,7 @@
     <script src="bower_components/angular-strap/dist/angular-strap.tpl.js"></script>
     <script src="bower_components/angular-translate/angular-translate.js"></script>
     <script src="bower_components/angular-local-storage/dist/angular-local-storage.js"></script>
-    <script src="bower_components/jsxgraph/distrib/jsxgraphcore.js"></script>
+    <script src="bower_components/jsxgraph/build/bin/jsxgraphcore.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -64,10 +64,13 @@
     <script src="scripts/main-ui/leftExpandable.js"></script>
     <script src="scripts/sketch/boardService.js"></script>
     <script src="scripts/sketch/loadService.js"></script>
+    <script src="scripts/sketch/snapService.js"></script>
     <script src="scripts/sketch/motionService.js"></script>
     <script src="scripts/sketch/eventHandler.js"></script>
     <script src="scripts/sketch/commands.js"></script>
+    <script src="scripts/sketch/commands/pointCmd.js"></script>
     <script src="scripts/sketch/commands/lineCmd.js"></script>
+    <script src="scripts/sketch/commands/triangleCmd.js"></script>
     <script src="scripts/sketch/commands/circleCmd.js"></script>
     <!-- endbuild -->
 </body>

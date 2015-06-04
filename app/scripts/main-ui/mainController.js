@@ -32,7 +32,7 @@ angular.module('geomeditApp')
       $scope.sidebar.go('toolbox');
       $translate.use(localStorage.get('lang'));
 
-      $scope.switchLanguage = function(lang){
+      $scope.switchLanguage = function(lang) {
         $translate.use(lang);
         localStorage.set('lang', lang);
       };
