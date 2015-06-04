@@ -1,0 +1,14 @@
+# OS junk files
+[Tt]humbs.db
+*.DS_Store
+*.bak*
+*.tmp
+*.log
+*~
+._*
+
+# Node Files
+node_modules/
+bower_components/
+.sass-cache/
+dist/

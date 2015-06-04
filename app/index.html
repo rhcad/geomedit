@@ -1,0 +1,74 @@
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <title>数学实验</title>
+    <meta name="description" content="基于动态几何的数学在线实验平台">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
+
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
+    <link rel="stylesheet" href="bower_components/angular-motion/dist/angular-motion.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+  </head>
+  <body ng-app="geomeditApp">
+    <!--[if lt IE 9]>
+      <p class="browse-happy">你的 IE 浏览器版本太低，请 <a href="http://browsehappy.com/">升级或更换浏览器</a> 后再访问本站。
+      <br>You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div ng-controller="MainCtrl">
+      <div ng-include="'views/header.html'" id="header"></div>
+      <div id="ed-body">
+        <div ng-include="'views/sidebar.html'" id="sidebar" ng-hide="sidebar.hidden"></div>
+        <div ng-include="'views/board.html'" id="board" left-expandable></div>
+        <div ng-include="'views/floaters.html'"></div>
+      </div>
+    </div>
+
+    <!-- build:js(.) scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-strap/dist/angular-strap.js"></script>
+    <script src="bower_components/angular-strap/dist/angular-strap.tpl.js"></script>
+    <script src="bower_components/angular-translate/angular-translate.js"></script>
+    <script src="bower_components/angular-local-storage/dist/angular-local-storage.js"></script>
+    <script src="bower_components/jsxgraph/distrib/jsxgraphcore.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <script src="scripts/app.js"></script>
+    <script src="scripts/translates.js"></script>
+    <script src="scripts/model/optionsFactory.js"></script>
+    <script src="scripts/model/boardFactory.js"></script>
+    <script src="scripts/main-ui/mainController.js"></script>
+    <script src="scripts/main-ui/headerService.js"></script>
+    <script src="scripts/main-ui/propertiesService.js"></script>
+    <script src="scripts/main-ui/popoverDirective.js"></script>
+    <script src="scripts/main-ui/leftExpandable.js"></script>
+    <script src="scripts/sketch/boardService.js"></script>
+    <script src="scripts/sketch/loadService.js"></script>
+    <script src="scripts/sketch/motionService.js"></script>
+    <script src="scripts/sketch/eventHandler.js"></script>
+    <script src="scripts/sketch/commands.js"></script>
+    <script src="scripts/sketch/commands/lineCmd.js"></script>
+    <script src="scripts/sketch/commands/circleCmd.js"></script>
+    <!-- endbuild -->
+</body>
+</html>
