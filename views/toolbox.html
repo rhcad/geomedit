@@ -1,1 +1,1 @@
-<ul class="nav"> <li ng-repeat="tool in toolbox.items()"> <a ng-click="toolbox.start(tool.id)"> <i ng-if="tool.id === toolbox.active()" class="fa fa-caret-right"></i> {{tool.title|translate}}</a> </li> </ul>
+<ul class="nav"> <li> <a ng-click="toolbox.cancel()"> <i ng-if="!toolbox.active()" class="fa fa-caret-right"></i> {{'Cmd_'|translate}}</a> </li> <li ng-repeat="tool in toolbox.items()"> <a ng-click="toolbox.start(tool.id)"> <i ng-if="tool.id === toolbox.active()" class="fa fa-caret-right"></i> {{tool.title|translate}}</a> </li> </ul>
