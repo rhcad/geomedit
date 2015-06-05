@@ -82,7 +82,7 @@ angular.module('geomeditApp')
             snapped = i >= 0 && bd.snaps[i].snapped,
             created = snapped ? bd.snaps[i].created : null;
         point.visProp.size = snapped ? snapSize : initial.size;
-        point.visProp.fillopacity = created ? 0.1 : snapped ? 0.4 : 1.0;
+        point.visProp.fillopacity = created && bd.snaps[i].glider ? 0.1 : snapped ? 0.3 : 1.0;
         point.visProp.strokecolor = created ? created.visProp.strokecolor : initial.strokecolor;
       }
 

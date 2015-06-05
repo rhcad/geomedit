@@ -17,12 +17,12 @@ angular.module('geomeditApp')
         Cmd_:          'Select',
         CmdPoint:      'Point',
         CmdSegment:    'Segment',
-        CmdRay:        'Ray line',
+        CmdRay:        'Half-line',
         CmdLine:       'Infinite line',
         CmdTriangle:   'Triangle',
         CmdQuadrangle: 'Quadrangle',
         CmdCircle2p:   'Circle with center',
-        CmdCircle3p:   'Circle through three points'
+        CmdCircle3p:   'Circle through 3 points'
       })
       .translations('cn', {
         Languages:   '界面语言',

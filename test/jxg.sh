@@ -10,5 +10,6 @@ cd bower_components/jsxgraph
 if [ ! -d node_modules/canvas ] ; then
     npm install
 fi
+make core-min
 make core
 cd ../..

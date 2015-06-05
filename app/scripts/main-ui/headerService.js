@@ -36,9 +36,10 @@ angular.module('geomeditApp')
           }
         },
         gestureBtn = {
-          icon:    'pencil',
-          checked: function() { return options.gestureMode; },
-          click:   function() {
+          icon:     'pencil',
+          disabled: function() { return !!board.command; },
+          checked:  function() { return !board.command && options.gestureMode; },
+          click:    function() {
             if (!this.disabled()) {
               options.gestureMode = !options.gestureMode;
             }
