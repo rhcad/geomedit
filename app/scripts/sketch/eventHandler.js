@@ -6,6 +6,8 @@ angular.module('geomeditApp')
   .service('eventHandler', ['board', 'options', 'motion', function(bd, options, motion) {
     var downEvent, upEvent, moveEvent;
     this.touchMode = false;
+    this.customDownHandlers = [];
+    this.customMoveHandlers = [];
 
     this.registerHandlers = function() {
       if (JXG.supportsPointerEvents()) {
@@ -126,11 +128,15 @@ angular.module('geomeditApp')
         };
         bd.board.hasMouseHandlers = false;
         this.touchMode = true;
-        bd.board.options.precision.hasPoint = bd.board.options.precision.touch;
       }
 
+      updatePrecision(this.touchMode);
       motion.updateStartCoords(e);
       motion.dragging = true;
+
+      this.customDownHandlers.forEach(function(handler) {
+        handler(e);
+      });
 
       if (bd.command) {
         (bd.command.downHandler || angular.noop)();
@@ -141,12 +147,24 @@ angular.module('geomeditApp')
       }
     };
 
+    function updatePrecision(touchMode) {
+      if (touchMode) {
+        bd.board.options.precision.hasPoint = bd.board.options.precision.touch;
+      }
+      else if (options.snap.project) {
+        bd.board.options.precision.hasPoint = bd.board.options.precision.touch / 2;
+      }
+    }
+
     this.moveEventHandler = function(e) {
       if (motion.dragging) {
-        if (this.touchMode) {
-          bd.board.options.precision.hasPoint = bd.board.options.precision.touch;
-        }
+        updatePrecision(this.touchMode);
         motion.updateCoords(e);
+
+        this.customMoveHandlers.forEach(function(handler) {
+          handler(e);
+        });
+
         if (bd.command) {
           if (bd.command.moveHandler) {
             bd.command.moveHandler();
@@ -161,11 +179,13 @@ angular.module('geomeditApp')
     };
 
     this.upEventHandler = function(e) {
-      motion.updateCoords(e);
-      motion.dragging = false;
-      if (bd.command) {
-        (bd.command.upHandler || angular.noop)();
-        bd.board.update();
+      if (motion.dragging) {
+        motion.updateCoords(e);
+        motion.dragging = false;
+        if (bd.command) {
+          (bd.command.upHandler || angular.noop)();
+          bd.board.update();
+        }
       }
     };
 

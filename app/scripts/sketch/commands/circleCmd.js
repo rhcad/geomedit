@@ -23,7 +23,7 @@ angular.module('geomeditApp')
       function upHandler() {
         if (motion.draftCoordsCount() === 3 && motion.lastDraftCoordsIsNew()) {
           motion.submit(function() {
-            bd.create('circumcircle', motion.createPoints());
+            return bd.create('circumcircle', motion.createPoints());
           });
         }
       }
@@ -50,7 +50,7 @@ angular.module('geomeditApp')
       function upHandler() {
         if (motion.lastDraftCoordsIsNew()) {
           motion.submit(function() {
-            bd.create('circle', motion.createPoints());
+            return bd.create('circle', motion.createPoints());
           });
         }
       }

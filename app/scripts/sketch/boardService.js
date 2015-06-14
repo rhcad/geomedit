@@ -3,7 +3,7 @@
 'use strict';
 
 angular.module('geomeditApp')
-  .service('boardService', ['board', 'eventHandler', function(bd, eventHandler) {
+  .service('boardService', ['board', 'eventHandler', 'select', function(bd, eventHandler, select) {
 
     this.initBoard = function(id) {
       bd.board = JXG.JSXGraph.initBoard(id, bd.initAttr);
@@ -17,6 +17,10 @@ angular.module('geomeditApp')
       if (bd.board) {
         id = bd.board.containerObj.id;
         eventHandler.unregisterHandlers();
+
+        bd.propObj = null;
+        select.resetSelection();
+
         JXG.JSXGraph.freeBoard(bd.board);
         bd.board = null;
       }
@@ -26,12 +30,12 @@ angular.module('geomeditApp')
     this.resizeBoard = function(w, h) {
       if (bd.board) {
         if (!equals(bd.board.canvasWidth, w) || !equals(bd.board.canvasHeight, h)) {
-          var xcenter = equals(bd.board.origin.scrCoords[1], bd.board.canvasWidth / 2),
-              ycenter = equals(bd.board.origin.scrCoords[2], bd.board.canvasHeight / 2);
+          var xcSame = equals(bd.board.origin.scrCoords[1], bd.board.canvasWidth / 2),
+              ycSame = equals(bd.board.origin.scrCoords[2], bd.board.canvasHeight / 2);
 
           bd.board.resizeContainer(w, h, false, true);
           bd.board.applyZoom();
-          if (xcenter && ycenter) {
+          if (xcSame && ycSame) {
             bd.board.moveOrigin(bd.board.canvasWidth / 2, bd.board.canvasHeight / 2);
           }
         }

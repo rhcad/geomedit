@@ -3,21 +3,25 @@
 'use strict';
 
 angular.module('geomeditApp')
-  .directive('leftExpandable', ['boardService', function(boardService) {
+  .directive('leftExpandable', ['boardService', 'eventHandler', function(boardService, eventHandler) {
     return {
       link: function(scope, element) {
-        var margin = element.css('margin-left');
+        var margin = element.css('margin-left') + 1;
 
         scope.$watch('sidebar.hidden', function(expanded) {
           element.css('margin-left', expanded ? 0 : margin);
           boardService.resizeBoard(element.width(), element.height());
         });
 
-        var oldresize = window.onresize || angular.noop;
+        var oldResize = window.onresize || angular.noop;
         window.onresize = function() {
-          oldresize();
+          oldResize();
           boardService.resizeBoard(element.width(), element.height());
         };
+
+        eventHandler.customDownHandlers.push(function() {
+          angular.element('body').click();  // Call $tooltip.hide()
+        });
       }
     };
   }]);

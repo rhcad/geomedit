@@ -20,23 +20,17 @@
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/home.css">
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
   </head>
-  <body ng-app="geomeditApp">
+  <body ng-app="geomeditApp" ng-controller="RootCtrl">
     <!--[if lt IE 9]>
       <p class="browse-happy">你的 IE 浏览器版本太低，请 <a href="http://browsehappy.com/">升级或更换浏览器</a> 后再访问本站。
       <br>You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-    <div ng-controller="MainCtrl">
-      <div ng-include="'views/header.html'" id="header"></div>
-      <div id="ed-body">
-        <div ng-include="'views/sidebar.html'" id="sidebar" ng-hide="sidebar.hidden"></div>
-        <div ng-include="'views/board.html'" id="board" left-expandable></div>
-        <div ng-include="'views/floaters.html'"></div>
-      </div>
-    </div>
+    <div ui-view></div>
 
     <!-- build:js(.) scripts/angular.js -->
     <!-- bower:js -->
@@ -58,23 +52,26 @@
 
     <!-- build:js(.) scripts/jsxgraph.js -->
     <!-- bower:js -->
-    <script src="bower_components/jsxgraph/distrib/jsxgraphcore.js"></script>
+    <script src="bower_components/jsxgraph/build/bin/jsxgraphcore.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/app.js"></script>
     <script src="scripts/translates.js"></script>
+    <script src="scripts/rootController.js"></script>
     <script src="scripts/model/optionsFactory.js"></script>
     <script src="scripts/model/boardFactory.js"></script>
     <script src="scripts/main-ui/mainController.js"></script>
     <script src="scripts/main-ui/headerService.js"></script>
-    <script src="scripts/main-ui/propertiesService.js"></script>
     <script src="scripts/main-ui/popoverDirective.js"></script>
     <script src="scripts/main-ui/leftExpandable.js"></script>
+    <script src="scripts/sketch/propertiesService.js"></script>
+    <script src="scripts/sketch/propController.js"></script>
     <script src="scripts/sketch/boardService.js"></script>
     <script src="scripts/sketch/loadService.js"></script>
     <script src="scripts/sketch/snapService.js"></script>
+    <script src="scripts/sketch/selectService.js"></script>
     <script src="scripts/sketch/motionService.js"></script>
     <script src="scripts/sketch/eventHandler.js"></script>
     <script src="scripts/sketch/commands.js"></script>

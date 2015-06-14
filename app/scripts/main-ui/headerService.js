@@ -34,27 +34,24 @@ angular.module('geomeditApp')
               options.draggable = !options.draggable;
             }
           }
-        },
+        },/*
         gestureBtn = {
           icon:     'pencil',
-          disabled: function() { return !!board.command; },
+          disabled: function() { return true; },
           checked:  function() { return !board.command && options.gestureMode; },
           click:    function() {
             if (!this.disabled()) {
               options.gestureMode = !options.gestureMode;
             }
           }
-        },
-        openBtn = {
-          icon:  'reorder',
-          click: function() {}
-        },
+        },*/
         optionsBtn = {
           icon:    'cog',
           popover: 'options',
           click:   function(scope) { scope.showOptionsPopover(); }
         };
 
-    this.leftButtons = [openBtn, undoBtn, redoBtn, dragBtn, gestureBtn];
-    this.rightButtons = [optionsBtn];
+    this.homeBtn = { icon: 'home' };
+    this.leftButtons = [undoBtn, redoBtn, dragBtn];
+    this.rightButtons = [optionsBtn, this.homeBtn];
   }]);

@@ -8,7 +8,6 @@ angular.module('geomeditApp')
     this.lastPt = null;
     this.pt = null;
     this.dragging = false;
-    this.pendings = null;
 
     this.updateStartCoords = function(e) {
       this.startPt = this.lastPt = this.pt = this.getEventCoords(e);
@@ -61,7 +60,10 @@ angular.module('geomeditApp')
     };
 
     this.lastDraftCoordsIsNew = function() {
-      var dist = this.getDraftCoords(-1).distance(JXG.COORDS_BY_SCREEN, this.getDraftCoords(-2));
+      var dist = 0;
+      if (bd.snaps.length > 1) {
+        dist = this.getDraftCoords(-1).distance(JXG.COORDS_BY_SCREEN, this.getDraftCoords(-2));
+      }
       return dist > 5;
     };
 
@@ -81,9 +83,11 @@ angular.module('geomeditApp')
         var i = Math.min(index, bd.snaps.length - 1),
             snapped = i >= 0 && bd.snaps[i].snapped,
             created = snapped ? bd.snaps[i].created : null;
-        point.visProp.size = snapped ? snapSize : initial.size;
-        point.visProp.fillopacity = created && bd.snaps[i].glider ? 0.1 : snapped ? 0.3 : 1.0;
-        point.visProp.strokecolor = created ? created.visProp.strokecolor : initial.strokecolor;
+        point.setAttribute({
+          size:        snapped ? snapSize : initial.size,
+          fillopacity: created && bd.snaps[i].glider ? 0.1 : snapped ? 0.3 : 1.0,
+          strokecolor: created ? created.visProp.strokecolor : initial.strokecolor
+        });
       }
 
       point.coords.on('update', update, point);
@@ -101,25 +105,24 @@ angular.module('geomeditApp')
 
     this.createPoint = function(index, attr) {
       var point = (function() {
-            var it = bd.snaps[index];
-            return it.detach() || !it.snapped && bd.create('point', it.coords.usrCoords.slice(1), attr);
-          }());
+        var it = bd.snaps[index];
+        return it.detach() || !it.snapped && bd.create('point', it.coords.usrCoords.slice(1), attr);
+      }());
 
-      if (point && this.pendings) {
-        this.pendings.push(point);
+      if (point && bd.pendings) {
+        bd.pendings.push(point);
       }
       return point;
     };
 
     this.createPoints = function(attr) {
-      var self = this;
       var ret = bd.snaps.map(function(item) {
         if (item.snapped && !item.created) {
           return item.snapped;
         }
         var point = item.created || bd.create('point', item.coords.usrCoords.slice(1), attr);
-        if (point && self.pendings) {
-          self.pendings.push(point);
+        if (point && bd.pendings) {
+          bd.pendings.push(point);
         }
         return point;
       });
@@ -128,35 +131,41 @@ angular.module('geomeditApp')
     };
 
     this.submit = function(creation) {
-      var self = this;
+      var self = this, sp;
       try {
         self.clearDrafts();
-        self.pendings = [];
-        creation();
+        bd.pendings = [];
+        sp = creation();
+        if (sp) {
+          if (bd.pendings.indexOf(sp) < 0) {
+            bd.pendings.push(sp);
+          }
+          bd.propObj = sp;
+        }
       } catch (e) {
-        self.pendings.forEach(function(el) {
-          bd.board.removeObject(el);
-        });
+        while (bd.pendings.length > 0) {
+          bd.board.removeObject(bd.pendings.pop());
+        }
         throw e;
       } finally {
-        self.pendings = null;
+        bd.pendings = null;
         self.clearDraftCoords();
       }
     };
 
     this.getMouseCoords = function(e) {
       var absPos = JXG.getPosition(e),
-          cPos = bd.board.getCoordsTopLeftCorner(),
-          dx = absPos[0] - cPos[0],
-          dy = absPos[1] - cPos[1];
+          lt = bd.board.getCoordsTopLeftCorner(),
+          dx = absPos[0] - lt[0],
+          dy = absPos[1] - lt[1];
       return new JXG.Coords(JXG.COORDS_BY_SCREEN, [dx, dy], bd.board);
     };
 
     this.getTouchCoords = function(e, index) {
       var absPos = JXG.getPosition(e, index),
-          cPos = bd.board.getCoordsTopLeftCorner(),
-          dx = absPos[0] - cPos[0],
-          dy = absPos[1] - cPos[1];
+          lt = bd.board.getCoordsTopLeftCorner(),
+          dx = absPos[0] - lt[0],
+          dy = absPos[1] - lt[1];
       return new JXG.Coords(JXG.COORDS_BY_SCREEN, [dx, dy], bd.board);
     };
 

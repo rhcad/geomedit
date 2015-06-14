@@ -17,11 +17,6 @@ angular.module('geomeditApp')
         showNavigation:  false,
         registerEvents:  false
       },
-      board:       null,
-      drafts:      [],
-      snaps:       [],
-      commands:    [],
-      command:     null,
       initOptions: {
         precision:    {
           hasPoint: 8
@@ -31,11 +26,11 @@ angular.module('geomeditApp')
         },
         midpoint:     {
           size:      4,
-          face:      'triangleup',
+          face:      '^',
           fillColor: 'none'
         },
         intersection: {
-          face: 'cross'
+          face: 'x'
         },
         glider:       {
           face:        'diamond',
@@ -43,6 +38,19 @@ angular.module('geomeditApp')
           strokeColor: '#00dd00'
         }
       },
+      uiOptions:   {
+        highlightColor:   '#ddd',
+        highlightSize:    12,
+        highlightOpacity: 0.8
+      },
+      board:       null,
+      drafts:      [],
+      snaps:       [],
+      pendings:    null,
+      propObj:     null,
+      selection:   [],
+      commands:    [],
+      command:     null,
       create:      function(type, parents, attr) {
         return this.board.create(type, parents, attr);
       },

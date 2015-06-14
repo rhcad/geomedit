@@ -12,7 +12,7 @@ angular.module('geomeditApp')
 
     function upHandler() {
       motion.submit(function() {
-        motion.createPoint(0);
+        return motion.createPoint(0);
       });
     }
 

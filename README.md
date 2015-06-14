@@ -4,14 +4,16 @@ An online geometry editor based on AngularJS and JSXGraph.
 
 [View online demo](https://rhcad.github.io/geomedit)
 
-![](doc/main.png) ![](doc/iphone.png)
+![](doc/main.png)
+
+![](doc/prop.png) ![](doc/iphone.png)
 
 ## Features
 
  - [x] Multiple devices (iOS, Android and PC) and browsers.
  - [x] Snapping points (vertex, glider, intersection and midpoint).
  - [x] Draw shapes interactively.
- - [ ] Show and edit properties of shapes.
+ - [x] Show and edit properties of shapes.
  - [ ] Load and save.
  - [ ] Undo and redo.
 

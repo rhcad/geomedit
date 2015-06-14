@@ -20,7 +20,7 @@ angular.module('geomeditApp')
       function upHandler() {
         if (motion.lastDraftCoordsIsNew()) {
           motion.submit(function() {
-            bd.create(type, motion.createPoints(), attr);
+            return bd.create(type, motion.createPoints(), attr);
           });
         }
       }

@@ -14,7 +14,7 @@ body {
   line-height: 40px;
   z-index: 2;
   color: #ddd;
-  background: rgb(119,119,119); /* Old browsers */
+  background: rgb(100,100,100); /* Old browsers */
   background: -moz-linear-gradient(top,  rgba(119,119,119,1) 0%, rgba(51,51,51,1) 100%); /* FF3.6+ */
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(119,119,119,1)), color-stop(100%,rgba(51,51,51,1))); /* Chrome,Safari4+ */
   background: -webkit-linear-gradient(top,  rgba(119,119,119,1) 0%,rgba(51,51,51,1) 100%); /* Chrome10+,Safari5.1+ */
@@ -65,7 +65,7 @@ body {
 }
 
 #sidebar {
-  width: 200px;
+  width: 220px;
   height: 100%;
   float: left;
   border-right: 1px solid #ddd;
@@ -81,7 +81,7 @@ body {
 }
 
 #sidebar-nav, .show-bar {
-  background: rgb(255,255,255); /* Old browsers */
+  background: rgb(240,240,240); /* Old browsers */
   background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(221,221,221,1) 100%); /* FF3.6+ */
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(221,221,221,1))); /* Chrome,Safari4+ */
   background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(221,221,221,1) 100%); /* Chrome10+,Safari5.1+ */
@@ -117,7 +117,7 @@ body {
 }
 
 #board {
-  margin-left: 200px;
+  margin-left: 220px;
   height: 100%;
 }
 
@@ -158,7 +158,7 @@ body {
   position: absolute;
   top: 40px;
   bottom: 0;
-  width: 200px;
+  width: 220px;
   overflow: auto;
 }
 
@@ -176,7 +176,7 @@ body {
   vertical-align: middle;
 }
 
-form button.pull-right {
+div button.pull-right {
   width: 40px;
 }
 
@@ -237,4 +237,175 @@ form button.pull-right {
   .popover-content {
     max-height: 220px;
   }
+}
+
+.prop-item {
+  padding: 8px;
+}
+
+.prop-head {
+  padding: 8px;
+  margin: 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.prop-item > :first-child {
+  height: 26px;
+}
+
+.prop-item > div > :nth-child(n+2) {
+  float: right;
+}
+
+.prop-item input {
+  width: 68px;
+  height: 26px;
+  text-align: center;
+}
+
+.prop-item button {
+  width: 68px;
+  padding: 2px;
+}
+
+.prop-item button.prop-btn-s {
+  width: 24px;
+}
+
+.prop-item button.prop-btn-m2 {
+  width: 33px;
+}
+
+.prop-item select {
+  width: 80px;
+}
+
+.prop-item > :nth-child(n+2) > :first-child {
+  padding-left: 2px;
+}
+
+.prop-item input + input,
+.prop-item button + button {
+  margin-right: 2px;
+}
+
+.prop-item div[ng-switch-when=lineEndings] > button {
+  width: 38px;
+  height: 26px;
+}
+
+.color-box {
+  width: 24px;
+  height: 26px;
+  text-align: center;
+  border: 2px solid transparent;
+}
+
+.prop-item div[ng-switch-when=color] {
+  height: 68px;
+}
+
+.prop-color-group {
+  border: 1px solid #777;
+  border-radius: 4px;
+  width: 154px;
+}
+
+.prop-color {
+  width: 36px;
+  height: 20px;
+  float: left;
+  margin: 1px;
+}
+
+.prop-color.active {
+  border: 2px solid blue;
+  border-radius: 2px;
+  margin: 0;
+  width: 38px;
+  height: 22px;
+}
+
+.prop-color-0 {
+  width: 0;
+  height: 0;
+  border-top: 20px solid transparent;
+  border-right: 36px solid #ccc;
+}
+
+input[colorpicker] {
+  text-align: left;
+}
+
+input[type=range] {
+  width: 100%;
+  margin: 6.95px 0;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-ms-track {
+  height: 6.1px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+  background: #bdbdbd;
+  border: 0.2px solid #010101;
+  border-radius: 2.6px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+input[type=range]::-ms-fill-upper {
+  background: #dcdcdc;
+  border: 0.2px solid #010101;
+  border-radius: 2.6px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+input[type=range]::-ms-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 1px solid #000000;
+  height: 20px;
+  width: 16px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+  height: 6.1px;
+}
+input[type=range]:focus::-ms-fill-lower {
+  background: #dcdcdc;
+}
+input[type=range]:focus::-ms-fill-upper {
+  background: #fbfbfb;
+}
+
+.btn:focus,
+.btn.focus,
+.btn:active:focus,
+.btn.active:focus,
+.btn:active.focus,
+.btn.active.focus {
+  outline: thin dotted;
+  outline: 3px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+.btn-default:hover {
+  background-color: #eee;
+}
+.btn-default:focus,
+.btn-default.focus {
+  background-color: #fff;
+}
+.btn-default:active,
+.btn-default:active,
+.btn-default:active:focus,
+.btn-default:active.focus,
+.btn-default.active:focus,
+.btn-default.active.focus {
+  background-color: #e6e6e6;
+}
+.btn-default:active:hover,
+.btn-default.active:hover {
+  background-color: #ccc;
 }

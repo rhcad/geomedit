@@ -8,7 +8,7 @@ angular.module('geomeditApp')
       var deferred = $q.defer();
 
       $timeout(function() {
-        deferred.resolve('');
+        deferred.resolve();
       }, 500);
 
       return deferred.promise;
@@ -20,7 +20,7 @@ angular.module('geomeditApp')
     return {
       link: function(scope, element, attrs) {
         loader.load().then(
-          function(/*data*/) {
+          function() {
             boardService.initBoard(attrs.id);
           });
       }

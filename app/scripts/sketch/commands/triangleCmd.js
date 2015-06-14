@@ -26,7 +26,7 @@ angular.module('geomeditApp')
       function upHandler() {
         if (motion.draftCoordsCount() === maxcount && motion.lastDraftCoordsIsNew()) {
           motion.submit(function() {
-            bd.create('polygon', motion.createPoints());
+            return bd.create('polygon', motion.createPoints());
           });
         }
       }
