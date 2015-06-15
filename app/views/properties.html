@@ -12,7 +12,7 @@
 
 <div class="prop-item" ng-repeat="prop in items" ng-switch on="prop.type">
   <div class="prop-title">
-    <span>{{'Prop'+prop.title|translate}}:</span>
+    <span>{{'Prop'+prop.title|translate|concatUnit:prop.unit:14}}:</span>
 
     <span class="prop-value-right" ng-switch-default>{{prop.type}}?</span>
     <input type="text" ng-model="prop.value" ng-switch-when="text"/>
@@ -97,7 +97,7 @@
 
 <div class="prop-item" ng-show="items.length < 1" ng-repeat="obj in objects()">
   <div ng-mouseenter="highlight(obj, true)" ng-mouseleave="highlight(obj, false)">
-    <span ng-click="selectObject(obj)">{{ trimID(obj.id) + ' ' + obj.elType }}</span>
+    <span ng-click="selectObject(obj)">{{ trimID(obj.id) + ' ' + obj.elType | truncate:20 }}</span>
     <button type="button" class="btn btn-default prop-btn-s"
             ng-click="removeObject(obj)">
       <i class="fa fa-trash-o"></i>

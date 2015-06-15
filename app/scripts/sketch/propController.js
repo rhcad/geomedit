@@ -61,3 +61,35 @@ angular.module('geomeditApp')
       });
     }
   ]);
+
+angular.module('geomeditApp').filter('concatUnit', function() {
+  return function(text, unit, maxLen) {
+    maxLen = maxLen ? maxLen : 14;
+    return text + (unit && text.length < maxLen ? '(' + unit + ')' : '');
+  };
+});
+
+/**
+ * Truncate Filter
+ * Usage
+ * {{myText|truncate}}
+ * {{myText|truncate:5}}
+ * {{myText|truncate:25:" ->"}}
+ * @Param text
+ * @Param length, default is 10
+ * @Param end, default is "…"
+ * @return string
+ */
+angular.module('geomeditApp').filter('truncate', function() {
+  return function(text, length, end) {
+    length = length ? length : 10;
+    end = end === undefined ? '…' : end;
+
+    if (text.length <= length || text.length - end.length <= length) {
+      return text;
+    }
+    else {
+      return text.substring(0, length-end.length) + end;
+    }
+  };
+});
