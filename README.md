@@ -2,7 +2,7 @@
 
 An online geometry editor based on AngularJS and JSXGraph.
 
-View online demos [on GitHub](http://rhcad.github.io/geomedit/#/sketch) or [on my site in China](http://rhcad.com/#/sketch).
+View online demos [on GitHub](http://rhcad.github.io/geomedit/#/sketch) or on [my site in China](http://rhcad.com/#/sketch).
 
 ![](doc/main.png)
 
@@ -37,4 +37,3 @@ Author: [Zhang Yungui](https://github.com/rhcad).
 
 - [Debug with the unminified version of JSXGraph library](doc/build_jxg.md) (Run `test/jxg.sh`)
 - [JSXGraph Homepage](http://jsxgraph.uni-bayreuth.de/wp/)
-- [JSXGraph Commands](http://www.onemathematicalcat.org/JSXGraphDocs/JSXGraphDocs.htm)
