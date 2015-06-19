@@ -21,11 +21,7 @@ View online demos [on GitHub](http://rhcad.github.io/geomedit/#/sketch) or on [m
 
 Run `npm install && bower install` to download all dependencies.
 
-Run `grunt` for building and `grunt serve` for preview.
-
-## Testing
-
-Running `grunt test` will run the unit tests with karma.
+Run `grunt serve` for preview and `grunt build` for deploying.
 
 ## License
 
