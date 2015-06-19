@@ -36,19 +36,23 @@ angular.module('geomeditApp')
     };
 
     this.getDraftCoords = function(index) {
-      index = index === undefined ? -1 : index;
+      index = JXG.def(index, -1);
       index = index < 0 ? bd.snaps.length + index : index;
-      return bd.snaps[index].coords;
+      return bd.snaps[index];
     };
 
-    this.setDraftCoords = function(index, pt) {
-      index = index === undefined ? -1 : index;
+    this.setDraftCoords = function(index, snapMasks) {
       index = index < 0 ? bd.snaps.length + index : index;
-      bd.snaps[index] = snap.snapCoords(pt === undefined ? this.pt : pt, bd.snaps[index]);
+      bd.snaps[index] = snap.snapCoords(this.pt, bd.snaps[index], snapMasks);
     };
 
-    this.addDraftCoords = function(pt) {
-      return bd.snaps.push(snap.snapCoords(pt === undefined ? this.pt : pt));
+    this.updateDraftCoords = function() {
+      var index = bd.snaps.length - 1;
+      bd.snaps[index] = snap.snapCoords(this.pt, bd.snaps[index]);
+    };
+
+    this.addDraftCoords = function(snapMasks) {
+      return bd.snaps.push(snap.snapCoords(this.pt, null, snapMasks));
     };
 
     this.draftCoordsCount = function() {
@@ -62,7 +66,7 @@ angular.module('geomeditApp')
     this.lastDraftCoordsIsNew = function() {
       var dist = 0;
       if (bd.snaps.length > 1) {
-        dist = this.getDraftCoords(-1).distance(JXG.COORDS_BY_SCREEN, this.getDraftCoords(-2));
+        dist = this.getDraftCoords(-1).coords.distance(JXG.COORDS_BY_SCREEN, this.getDraftCoords(-2).coords);
       }
       return dist > 5;
     };
@@ -103,12 +107,12 @@ angular.module('geomeditApp')
       return indexes.map(function(i) { return self.createDraftPoint(i); });
     };
 
-    this.createPoint = function(index, attr) {
-      var point = (function() {
-        var it = bd.snaps[index];
-        return it.detach() || !it.snapped && bd.create('point', it.coords.usrCoords.slice(1), attr);
-      }());
-
+    this.createPoint = function(index, allowSnapped, attr) {
+      var it = JXG.isObject(index) ? index : bd.snaps[index];
+      if (allowSnapped && it.snapped && !it.created) {
+        return it.snapped;
+      }
+      var point = it.detach() || !it.snapped && bd.create('point', it.coords.usrCoords.slice(1), attr);
       if (point && bd.pendings) {
         bd.pendings.push(point);
       }
@@ -116,16 +120,10 @@ angular.module('geomeditApp')
     };
 
     this.createPoints = function(attr) {
-      var ret = bd.snaps.map(function(item) {
-        if (item.snapped && !item.created) {
-          return item.snapped;
-        }
-        var point = item.created || bd.create('point', item.coords.usrCoords.slice(1), attr);
-        if (point && bd.pendings) {
-          bd.pendings.push(point);
-        }
-        return point;
-      });
+      var self = this,
+          ret = bd.snaps.map(function(item) {
+            return self.createPoint(item, true, attr);
+          });
       bd.snaps.length = 0;
       return ret;
     };

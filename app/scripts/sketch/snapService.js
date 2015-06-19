@@ -5,39 +5,70 @@
 angular.module('geomeditApp')
   .service('snap', ['board', 'options', function(bd, options) {
 
-    this.snapCoords = function(coords, lastSnap) {
-      var snapSize = bd.board.options.precision.hasPoint,
-          v = {
-            coords:   coords,
-            draftIDs: getDraftIDs(),
-            hits:     [],
-            snapSize: snapSize,
-            minDist:  snapSize,
-            dist:     0,
-            snapped:  null,
-            mid:      null,
-            cross:    null,
-            created:  lastSnap ? lastSnap.glider : null,
-            glider:   lastSnap ? lastSnap.glider : null
-          };
+    function makeParam(coords, masks) {
+      var snapSize = bd.board.options.precision.hasPoint;
+      return {
+        coords:   coords,
+        hits:     [],
+        masks:    masks,
+        snapSize: snapSize,
+        minDist:  snapSize,
+        dist:     0,
+        snapped:  null,
+        glider:   null
+      };
+    }
+
+    this.snapCoords = function(coords, lastSnap, masks) {
+      var v = makeParam(coords, masks),
+          oldSnapSize,
+          snap = options.snap;
+
+      JXG.extend(v, {
+        draftIDs: getDraftIDs(),
+        mid:      null,
+        cross:    null,
+        created:  lastSnap ? lastSnap.glider : null,
+        glider:   lastSnap ? lastSnap.glider : null
+      });
 
       if (lastSnap) {
-        bd.board.removeObject(lastSnap.mid);
-        bd.board.removeObject(lastSnap.cross);
+        if (lastSnap.created && !lastSnap.glider) {
+          bd.board.removeObject(lastSnap.created);
+        }
+        v.masks = masks || lastSnap.masks;
       }
-      if (options.snap.vertex) {
-        _snapPoint(v);
+      if (v.masks) {
+        oldSnapSize = bd.board.options.precision.hasPoint;
+        v.snapSize = Math.max(v.snapSize, 60);
+        v.minDist = v.snapSize;
+        bd.board.options.precision.hasPoint = v.snapSize;
+
+        snap.vertex = snap.vertex || v.masks.vertex;
+        snap.mid = snap.mid || v.masks.mid;
+        snap.cross = snap.cross || v.masks.cross;
+        snap.glider = snap.glider || v.masks.glider;
       }
-      if (v.minDist > snapSize / 4) {
+
+      if (v.masks && JXG.isFunction(v.masks.filter)) {
         gatherHits(v);
-        if (options.snap.mid) {
-          _snapMidPoint(v);
+        v.masks.filter(v);
+      }
+      else {
+        if (options.snap.vertex && (!v.masks || v.masks.vertex)) {
+          _snapPoint(v);
         }
-        if (options.snap.cross && !v.mid) {
-          _snapCross(v);
-        }
-        if (options.snap.glider && !v.snapped) {
-          _snapGlider(v);
+        if (v.minDist > v.snapSize / 4) {
+          gatherHits(v);
+          if (options.snap.mid && (!v.masks || v.masks.mid)) {
+            _snapMidPoint(v);
+          }
+          if (options.snap.cross && !v.mid && (!v.masks || v.masks.cross)) {
+            _snapCross(v);
+          }
+          if (options.snap.glider && !v.snapped && (!v.masks || v.masks.glider)) {
+            _snapGlider(v);
+          }
         }
       }
 
@@ -45,7 +76,10 @@ angular.module('geomeditApp')
         bd.board.removeObject(v.glider);
         v.glider = null;
       }
-      v.created = v.mid || v.cross || v.glider;
+      v.created = v.mid || v.cross || v.glider || v.created;
+      if (oldSnapSize) {
+        bd.board.options.precision.hasPoint = oldSnapSize;
+      }
 
       return {
         coords:  (v.created || v.snapped || v).coords,
@@ -54,6 +88,7 @@ angular.module('geomeditApp')
         mid:     v.mid,
         cross:   v.cross,
         glider:  v.glider,
+        masks:   v.masks,
         clear:   function() {
           if (v.created) {
             bd.board.removeObject(v.created);
@@ -77,19 +112,10 @@ angular.module('geomeditApp')
     };
 
     this.hitTest = function(coords) {
-      var snapSize = bd.board.options.precision.hasPoint,
-          v = {
-            coords:   coords,
-            hits:     [],
-            snapSize: snapSize,
-            minDist:  snapSize,
-            dist:     0,
-            snapped:  null,
-            glider:   null
-          };
+      var v = makeParam(coords);
 
       _snapPoint(v);
-      if (v.minDist > snapSize / 4) {
+      if (v.minDist > v.snapSize / 4) {
         gatherHits(v);
         if (v.hits.length === 1) {
           v.snapped = v.hits[0];
@@ -107,7 +133,7 @@ angular.module('geomeditApp')
       var ids = bd.drafts.map(function(el) { return el.id; });
       bd.snaps.forEach(function(item) {
         if (item.created) {
-          ids.push(item.created);
+          ids.push(item.created.id);
         }
       });
       return ids;
@@ -137,9 +163,13 @@ angular.module('geomeditApp')
         return cls === JXG.OBJECT_CLASS_LINE ||
           cls === JXG.OBJECT_CLASS_CIRCLE || cls === JXG.OBJECT_CLASS_CURVE;
       }
+      function canSnapPoints(el) {
+        return v.masks && v.masks.filter && JXG.isPoint(el);
+      }
 
       scanObjects(v, function(el) {
-        if (canHasGlider(el.elementClass) && el.hasPoint(v.coords.scrCoords[1], v.coords.scrCoords[2])) {
+        if ( (canSnapPoints(el) || canHasGlider(el.elementClass)) &&
+          el.hasPoint(v.coords.scrCoords[1], v.coords.scrCoords[2])) {
           v.hits.push(el);
         }
       });

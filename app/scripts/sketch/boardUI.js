@@ -3,7 +3,7 @@
 'use strict';
 
 angular.module('geomeditApp')
-  .service('boardService', ['board', 'eventHandler', 'select', function(bd, eventHandler, select) {
+  .service('boardUI', ['board', 'eventHandler', 'select', function(bd, eventHandler, select) {
 
     this.initBoard = function(id) {
       bd.board = JXG.JSXGraph.initBoard(id, bd.initAttr);

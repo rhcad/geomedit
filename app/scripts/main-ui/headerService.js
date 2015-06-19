@@ -8,6 +8,7 @@ angular.module('geomeditApp')
         _canRedo = false;
 
     var undoBtn = {
+          tooltip:  'Undo',
           icon:     'reply',
           disabled: function() { return !_canUndo; },
           click:    function() {
@@ -17,6 +18,7 @@ angular.module('geomeditApp')
           }
         },
         redoBtn = {
+          tooltip:  'Redo',
           icon:     'share',
           disabled: function() { return !_canRedo; },
           click:    function() {
@@ -25,33 +27,32 @@ angular.module('geomeditApp')
             }
           }
         },
-        dragBtn = {
-          icon:     'arrows',
-          disabled: function() { return !!board.command; },
-          checked:  function() { return !board.command && options.draggable; },
-          click:    function() {
-            if (!this.disabled()) {
-              options.draggable = !options.draggable;
-            }
-          }
-        },/*
-        gestureBtn = {
-          icon:     'pencil',
-          disabled: function() { return true; },
-          checked:  function() { return !board.command && options.gestureMode; },
-          click:    function() {
-            if (!this.disabled()) {
-              options.gestureMode = !options.gestureMode;
-            }
-          }
-        },*/
         optionsBtn = {
+          tooltip: 'Options',
           icon:    'cog',
           popover: 'options',
           click:   function(scope) { scope.showOptionsPopover(); }
         };
 
-    this.homeBtn = { icon: 'home' };
-    this.leftButtons = [undoBtn, redoBtn, dragBtn];
+    this.cancelBtn = {
+      tooltip:  'CancelCmd',
+      icon:     'times-circle',
+      disabled: function() { return !board.command; }
+    };
+
+    this.dragBtn = {
+      tooltip:  'DraggingMode',
+      icon:     'arrows',
+      disabled: function() { return !!board.command; },
+      checked:  function() { return !board.command && options.draggable; },
+      click:    function() {
+        if (!this.disabled()) {
+          options.draggable = !options.draggable;
+        }
+      }
+    };
+
+    this.homeBtn = { tooltip: 'Home', icon: 'home' };
+    this.leftButtons = [undoBtn, redoBtn, this.dragBtn, this.cancelBtn];
     this.rightButtons = [optionsBtn, this.homeBtn];
   }]);

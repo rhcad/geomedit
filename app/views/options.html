@@ -1,5 +1,5 @@
 <div name="popoverForm">
-  <p style="min-width:250px;margin-bottom:0"></p>
+  <p style="min-width:220px;margin-bottom:0"></p>
 
   <p class="options-section">{{'SnapOptions'|translate}}</p>
   <div class="form-group" ng-repeat="opt in snap.items" ng-switch on="opt.type">
@@ -14,5 +14,11 @@
   <div class="form-actions">
     <button type="button" class="btn btn-default" ng-click="switchLanguage('cn')">中文</button>
     <button type="button" class="btn btn-default" ng-click="switchLanguage('en')">English</button>
+  </div>
+  <div class="form-group">
+    <span class="option-label">{{'ShowTooltip'|translate}}</span>
+    <button type="button" class="btn btn-default pull-right" ng-model="tooltip.show" bs-checkbox>
+      <i class="fa fa-{{tooltip.show ? 'check' : 'times'}}"></i>
+    </button>
   </div>
 </div>

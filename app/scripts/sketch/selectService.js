@@ -58,21 +58,25 @@ angular.module('geomeditApp')
         withLabel:     false,
         highlighted:   true,
         strokeOpacity: bd.uiOptions.highlightOpacity,
-        strokeWidth:   obj.getAttribute('strokeWidth') + bd.uiOptions.highlightSize,
-        strokeColor:   bd.uiOptions.highlightColor
+        strokeColor:   bd.uiOptions.highlightColor,
+        strokeWidth:   (obj.getAttribute ? obj.getAttribute('strokeWidth') : 0) + bd.uiOptions.highlightSize
       };
+
+      function createForCoords(coords) {
+        attr.size = bd.uiOptions.highlightSize;
+        attr.strokeWidth = 0;
+        attr.snapToGrid = false;
+        attr.fillColor = bd.uiOptions.highlightColor;
+        attr.fillOpacity = bd.uiOptions.highlightOpacity;
+        newObj = bd.create('point', [
+          function() { return coords.usrCoords[1]; },
+          function() { return coords.usrCoords[2]; }
+        ], attr);
+      }
 
       switch (obj.elementClass) {
         case JXG.OBJECT_CLASS_POINT:
-          attr.size = bd.uiOptions.highlightSize;
-          attr.strokeWidth = 0;
-          attr.snapToGrid = false;
-          attr.fillColor = bd.uiOptions.highlightColor;
-          attr.fillOpacity = bd.uiOptions.highlightOpacity;
-          newObj = bd.create('point', [
-            function() { return obj.coords.usrCoords[1]; },
-            function() { return obj.coords.usrCoords[2]; }
-          ], attr);
+          createForCoords(obj.coords);
           break;
 
         case JXG.OBJECT_CLASS_CIRCLE:
@@ -86,6 +90,9 @@ angular.module('geomeditApp')
           break;
 
         case JXG.OBJECT_CLASS_CURVE:
+          if (obj.type === JXG.OBJECT_TYPE_GRID) {
+            attr.strokeOpacity /= 2;
+          }
           if (obj.type === JXG.OBJECT_TYPE_ANGLE || obj.type === JXG.OBJECT_TYPE_ARC || obj.type === JXG.OBJECT_TYPE_SECTOR) {
             newObj = bd.create('curve', [obj.dataX, obj.dataY], attr);
             newObj.bezierDegree = 3;
@@ -96,8 +103,14 @@ angular.module('geomeditApp')
           }
           break;
       }
-      if (obj.type === JXG.OBJECT_TYPE_POLYGON) {
-        newObj = obj.borders.map(function(line) { return createHighlightObject(line); });
+      switch (obj.type) {
+        case JXG.OBJECT_TYPE_POLYGON:
+          newObj = obj.borders.map(function(line) { return createHighlightObject(line); });
+          break;
+
+        case JXG.OBJECT_TYPE_TEXT:
+          createForCoords(obj.coords);
+          break;
       }
 
       return newObj;

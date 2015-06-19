@@ -10,13 +10,16 @@ angular.module('geomeditApp')
       $scope.items = properties.items;
 
       $scope.trimID = function(id) {
-        return id.replace(/.*Board\d?/, '');
+        return id.replace(/.*Board\d*/, '');
       };
 
       $scope.info = function() {
         var ret = { id: properties.id };
-        ret.type = bd.propObj ? bd.propObj.elType : '';
-        ret.description = ret.type + ': ' + $scope.trimID(ret.id);
+        if (bd.propObj && bd.propObj.elType) {
+          ret.elType = bd.propObj.elType;
+          ret.description = $scope.trimID(ret.id) + ': ' + ret.elType;
+          ret.visible = bd.propObj.getAttribute('visible');
+        }
         return ret;
       };
 
@@ -39,6 +42,7 @@ angular.module('geomeditApp')
       };
 
       $scope.switchVisible = function(obj) {
+        obj = obj ? obj : bd.propObj;
         obj.setAttribute({ visible: !obj.getAttribute('visible') });
       };
 
@@ -51,10 +55,10 @@ angular.module('geomeditApp')
         return select.highlight.apply(select, arguments);
       };
 
-      properties.updateView = function () {
+      properties.updateView = function() {
         $scope.$applyAsync();
       };
-      $scope.$watch(properties.needSave, function (newValue) {
+      $scope.$watch(properties.needSave, function(newValue) {
         if (newValue) {
           properties.save();
         }
@@ -82,14 +86,27 @@ angular.module('geomeditApp').filter('concatUnit', function() {
  */
 angular.module('geomeditApp').filter('truncate', function() {
   return function(text, length, end) {
+    if (!text) {
+      return text;
+    }
+
     length = length ? length : 10;
-    end = end === undefined ? '…' : end;
+    end = JXG.def(end, '…');
 
     if (text.length <= length || text.length - end.length <= length) {
       return text;
     }
     else {
-      return text.substring(0, length-end.length) + end;
+      return text.substring(0, length - end.length) + end;
     }
+  };
+});
+
+angular.module('geomeditApp').filter('camelCase', function() {
+  return function(text, littleCamelCase) {
+    text = littleCamelCase ? text : '_' + text;
+    return text.replace(/_(.)/g, function(match, letter) {
+      return letter.toUpperCase();
+    });
   };
 });

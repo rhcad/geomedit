@@ -1,12 +1,17 @@
-<ul class="nav">
-  <li>
-    <a ng-click="toolbox.cancel()">
-      <i ng-if="!toolbox.active()" class="fa fa-caret-right"></i>
-      {{'Cmd_'|translate}}</a>
-  </li>
-  <li ng-repeat="tool in toolbox.items()">
-    <a ng-click="toolbox.start(tool.id)">
-      <i ng-if="tool.id === toolbox.active()" class="fa fa-caret-right"></i>
-      {{tool.title|translate}}</a>
-  </li>
-</ul>
+<div class="toolbox">
+  <div class="toolbox-group" ng-repeat="group in toolbox.groups()">
+    <div class="toolbox-titlebar" ng-click="group.expand=!group.expand">
+      <span>{{group.name|camelCase|translate}}</span>
+      <span>
+        <i class="fa fa-{{group.expand ? 'angle-up' : 'angle-down'}}"></i>
+      </span>
+    </div>
+    <ul class="nav" ng-show="group.expand">
+      <li ng-repeat="tool in group.commands">
+        <a ng-click="toolbox.start(tool)">
+          <i ng-if="tool === toolbox.active()" class="fa fa-caret-right"></i>
+          {{'Cmd_'+tool|camelCase|translate}}</a>
+      </li>
+    </ul>
+  </div>
+</div>

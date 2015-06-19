@@ -3,8 +3,8 @@
 'use strict';
 
 angular.module('geomeditApp')
-  .factory('properties', ['board', 'eventHandler', 'commands', 'motion', 'snap', 'select',
-    function(bd, eventHandler, commands, motion, snap, select) {
+  .factory('properties', ['board', 'eventHandler', 'commands', 'select',
+    function(bd, eventHandler, commands, select) {
       var active = false,
           creators = {},
           data = {};
@@ -36,11 +36,13 @@ angular.module('geomeditApp')
       };
       data.onExit = function() {
         active = false;
+        bd.propObj = null;
+        data.fetch();
       };
 
       eventHandler.customDownHandlers.push(function() {
         if (active) {
-          bd.propObj = snap.hitTest(motion.pt);
+          bd.propObj = bd.board.downObjects[0];
           data.fetch();
         }
       });
@@ -52,20 +54,30 @@ angular.module('geomeditApp')
       });
 
       data.fetch = function() {
-        var item, items = [];
+        var item, items = [], keys = [];
 
-        data.id = bd.propObj ? bd.propObj.id : '';
-        if (data.id) {
-          getKeys(bd.propObj.elementClass, bd.propObj.type, bd.propObj.elType).forEach(function(key) {
-            item = creators[key];
-            if (item && item.get && item.get() !== false) {
-              item.title = item.title || key.substring(0, 1).toUpperCase() + key.substring(1);
-              item.oldValue = JXG.isObject(item.value) ? JXG.deepCopy({}, item.value) : item.value;
-              item.id = key;
-              items.push(item);
-            }
-          });
+        if (JXG.isString(bd.propObj)) {
+          data.id = bd.propObj;
+          if (bd.propObj === 'board') {
+            keys = ['ignoreLabels', 'canZoom', 'origin', 'unit'];
+          }
         }
+        else {
+          data.id = bd.propObj ? bd.propObj.id : '';
+          if (data.id) {
+            keys = getKeys(bd.propObj.elementClass, bd.propObj.type, bd.propObj.elType);
+          }
+        }
+
+        keys.forEach(function(key) {
+          item = creators[key];
+          if (item && item.get && item.get() !== false) {
+            item.oldValue = JXG.isObject(item.value) ? JXG.deepCopy({}, item.value) : item.value;
+            item.id = key;
+            items.push(item);
+          }
+        });
+
         data.items.length = 0;
         JXG.extend(data.items, items);
         data.updateView();
@@ -104,14 +116,17 @@ angular.module('geomeditApp')
       };
 
       function getKeys(elCls, objType, elType) {
-        var i, items = ['label', 'fontSize', 'textColor', 'fixed', 'trace'];
+        var items = ['label', 'fontSize', 'textColor', 'fixed', 'trace'];
 
         if (elType === 'slider') {
-          items = ['label', 'range', 'fontSize', 'textColor', 'snapWidth', 'face', 'size',
+          items = ['range', 'snapWidth', 'face', 'size', 'label', 'fontSize', 'textColor',
             'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'];
         }
         else if (elCls === JXG.OBJECT_CLASS_POINT) {
           items = ['coords', 'face', 'size', 'color', 'opacity'].concat(items);
+        }
+        else if (objType === JXG.OBJECT_TYPE_AXIS) {
+          items = ['strokeWidth', 'strokeColor', 'strokeOpacity', 'label', 'fontSize', 'textColor'];
         }
         else if (elCls === JXG.OBJECT_CLASS_LINE) {
           items = ['lineEndings', 'strokeWidth', 'strokeColor', 'strokeOpacity'].concat(items);
@@ -120,24 +135,22 @@ angular.module('geomeditApp')
           items = ['radius', 'centerVisible', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'].concat(items);
         }
         else if (objType === JXG.OBJECT_TYPE_POLYGON) {
-          items = ['label', 'draggable', 'fontSize', 'textColor', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'];
+          items = ['strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'].concat(items);
         }
         else if (objType === JXG.OBJECT_TYPE_ANGLE) {
-          items = ['label', 'radius', 'fontSize', 'textColor', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'];
+          items = ['radius', 'label', 'fontSize', 'textColor', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'];
         }
         else if (objType === JXG.OBJECT_TYPE_SECTOR) {
           items = ['label', 'fontSize', 'textColor', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'];
+        }
+        else if (objType === JXG.OBJECT_TYPE_GRID) {
+          items = ['strokeWidth', 'strokeColor', 'strokeOpacity'];
         }
         else if (elCls === JXG.OBJECT_CLASS_CURVE) {
           items = ['functionTerm', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'].concat(items);
         }
         else if (objType === JXG.OBJECT_TYPE_TEXT) {
           items = ['text', 'fontSize', 'textColor', 'fixed'];
-        }
-
-        i = items.indexOf('label');
-        if (i > 0) {
-          items.unshift(items.splice(i, 1)[0]);
         }
 
         return items;
@@ -158,19 +171,24 @@ angular.module('geomeditApp')
       creators.strokeWidth = {
         type: 'range', unit: 'px', min: 0.5, max: 50, step: 0.5,
         get:  function() {
-          this.value = bd.propObj.getAttribute('strokewidth');
+          this.value = bd.propObj.getAttribute('strokeWidth');
         },
         set:  function() {
           if (isFloat(this.value, this.min, this.max)) {
-            return setPolygonAttribute({ strokewidth: parseFloat(this.value) });
+            return setPolygonAttribute({ strokeWidth: parseFloat(this.value) });
           }
         }
       };
 
-      function setPolygonAttribute(attr) {
+      function setPolygonAttribute(attr, vertices) {
         var r = bd.propObj.setAttribute(attr);
         if (bd.propObj.borders) {
           bd.propObj.borders.forEach(function(el) {
+            el.setAttribute(attr);
+          });
+        }
+        if (vertices && bd.propObj.vertices) {
+          bd.propObj.vertices.forEach(function(el) {
             el.setAttribute(attr);
           });
         }
@@ -311,7 +329,7 @@ angular.module('geomeditApp')
           this.value = bd.propObj.getAttribute('fixed');
         },
         set:  function() {
-          return bd.propObj.setAttribute({ fixed: this.value });
+          return setPolygonAttribute({ fixed: this.value }, true);
         }
       };
 
@@ -322,16 +340,6 @@ angular.module('geomeditApp')
         },
         set:  function() {
           return bd.propObj.setAttribute({ trace: this.value });
-        }
-      };
-
-      creators.draggable = {
-        type: 'checkbox',
-        get:  function() {
-          this.value = bd.propObj.getAttribute('draggable');
-        },
-        set:  function() {
-          return bd.propObj.setAttribute({ draggable: this.value });
         }
       };
 
@@ -438,8 +446,9 @@ angular.module('geomeditApp')
           this.value = this.element() ? this.element().getAttribute('fontSize') : '';
         },
         set:     function() {
-          if (this.element() && isFloat(this.value, this.min, this.max)) {
-            return this.element().setAttribute({ fontSize: parseFloat(this.value) });
+          var element = this.element();
+          if (element && isFloat(this.value, this.min, this.max)) {
+            return element.setAttribute({ fontSize: parseFloat(this.value) }).updateSize();
           }
         },
         element: function() {
@@ -459,6 +468,28 @@ angular.module('geomeditApp')
         },
         element: function() {
           return !bd.propObj ? null : bd.propObj.type === JXG.OBJECT_TYPE_TEXT ? bd.propObj : bd.propObj.label;
+        }
+      };
+
+      creators.ignoreLabels = {
+        type: 'checkbox',
+        get:  function() {
+          this.value = bd.board.attr.ignorelabels;
+        },
+        set:  function() {
+          bd.board.attr.ignorelabels = !!this.value;
+          return true;
+        }
+      };
+
+      creators.canZoom = {
+        type: 'checkbox',
+        get:  function() {
+          this.value = bd.board.attr.zoom;
+        },
+        set:  function() {
+          bd.board.attr.zoom = !!this.value;
+          return true;
         }
       };
 

@@ -11,5 +11,7 @@ angular.module('geomeditApp')
         $translate.use(lang);
         localStorage.set('lang', lang);
       };
+
+      $scope.tooltip = { show: !JXG.isApple() };
     }
   ]);

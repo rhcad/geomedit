@@ -34,7 +34,7 @@ angular.module('geomeditApp', ['ui.router', 'ngAnimate', 'mgcrea.ngStrap', 'pasc
           controller:  'PropCtrl'
         });
 
-      $urlRouterProvider.otherwise('/');
+      $urlRouterProvider.otherwise('/sketch');
       localStorage.setPrefix('geomedit');
 
     }]);

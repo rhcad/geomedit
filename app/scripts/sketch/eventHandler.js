@@ -134,10 +134,6 @@ angular.module('geomeditApp')
       motion.updateStartCoords(e);
       motion.dragging = true;
 
-      this.customDownHandlers.forEach(function(handler) {
-        handler(e);
-      });
-
       if (bd.command) {
         (bd.command.downHandler || angular.noop)();
         bd.board.update();
@@ -145,6 +141,11 @@ angular.module('geomeditApp')
       else if (options.draggable) {
         (this.jxgDownHandler || angular.noop)(e);
       }
+
+      angular.element('body').click();  // Call $tooltip.hide()
+      this.customDownHandlers.forEach(function(handler) {
+        handler(e);
+      });
     };
 
     function updatePrecision(touchMode) {
@@ -170,7 +171,7 @@ angular.module('geomeditApp')
             bd.command.moveHandler();
           }
           else if (motion.hasDraftCoords()) {
-            motion.setDraftCoords();
+            motion.updateDraftCoords();
           }
           bd.board.update();
           motion.lastPt = motion.pt;

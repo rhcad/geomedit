@@ -9,19 +9,19 @@ angular.module('geomeditApp')
 
       $timeout(function() {
         deferred.resolve();
-      }, 500);
+      }, 50);
 
       return deferred.promise;
     };
   }]);
 
 angular.module('geomeditApp')
-  .directive('newBoard', ['loader', 'boardService', function(loader, boardService) {
+  .directive('newBoard', ['loader', 'boardUI', function(loader, boardUI) {
     return {
       link: function(scope, element, attrs) {
         loader.load().then(
           function() {
-            boardService.initBoard(attrs.id);
+            boardUI.initBoard(attrs.id);
           });
       }
     };

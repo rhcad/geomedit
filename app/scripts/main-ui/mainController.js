@@ -3,14 +3,18 @@
 'use strict';
 
 angular.module('geomeditApp')
-  .controller('MainCtrl', ['$scope', '$state', 'localStorageService', 'header', 'commands', 'properties', 'options', 'boardService',
-    function($scope, $state, localStorage, header, cmds, properties, options, boardService) {
+  .controller('MainCtrl', ['$scope', '$state', 'localStorageService', 'header', 'commands', 'properties', 'options', 'boardUI',
+    function($scope, $state, localStorage, header, commands, properties, options, boardUI) {
 
       $scope.leftButtons = header.leftButtons;
       $scope.rightButtons = header.rightButtons;
-      header.homeBtn.click = function() { $state.go('home'); };
-      $scope.toolbox = cmds;
+      $scope.toolbox = commands;
       $scope.snap = options.snap;
+
+      header.homeBtn.click = function() { $state.go('home'); };
+      header.cancelBtn.click = function() { commands.cancel(); };
+      header.cancelBtn.hide = function() { return header.cancelBtn.disabled(); };
+      header.dragBtn.hide = function() { return header.dragBtn.disabled(); };
 
       $scope.sidebar = {
         views:  [
@@ -32,7 +36,11 @@ angular.module('geomeditApp')
       };
 
       $state.get('sketch').onExit = function() {
-        boardService.freeBoard();
+        boardUI.freeBoard();
+      };
+      $scope.recreateBoard = function() {
+        boardUI.initBoard(boardUI.freeBoard());
+        $scope.$applyAsync();
       };
 
       var propState = $state.get('sketch.properties');

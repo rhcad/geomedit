@@ -19,7 +19,7 @@ angular.module('geomeditApp')
           }
         }
         else {
-          motion.setDraftCoords();
+          motion.updateDraftCoords();
         }
       }
 
@@ -31,7 +31,7 @@ angular.module('geomeditApp')
         }
       }
 
-      bd.addCommand({
+      bd.addCommand('polygon', {
         id:          id,
         downHandler: downHandler,
         upHandler:   upHandler

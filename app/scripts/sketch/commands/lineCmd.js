@@ -13,7 +13,7 @@ angular.module('geomeditApp')
           bd.drafts.push(bd.create(type, motion.createDraftPoints(0, 1), attr));
         }
         else {
-          motion.setDraftCoords();
+          motion.updateDraftCoords();
         }
       }
 
@@ -25,7 +25,7 @@ angular.module('geomeditApp')
         }
       }
 
-      bd.addCommand({
+      bd.addCommand('line', {
         id:          id,
         downHandler: downHandler,
         upHandler:   upHandler

@@ -4,18 +4,18 @@
 
 angular.module('geomeditApp')
   .service('commands', ['board', 'motion', 'select', function(bd, motion, select) {
-    var _items = null;
+    var _cmdCount = 0, _groups = null;
 
-    this.items = function() {
-      if (!_items || _items.length !== bd.commands.length) {
-        _items = bd.commands.map(function(cmd) {
-          var title = ('Cmd_' + cmd.id).replace(/_(.)/g, function(match, letter) {
-            return letter.toUpperCase();
-          });
-          return { id: cmd.id, title: title };
+    this.groups = function() {
+      if (_cmdCount !== bd.commands.length) {
+        _cmdCount = bd.commands.length;
+        _groups = bd.cmdGroups.map(function(group) {
+          return { name: group.name, commands: group.commands.map(function(cmd) {
+            return cmd.id;
+          })};
         });
       }
-      return _items;
+      return _groups;
     };
 
     this.active = function() {
@@ -34,8 +34,7 @@ angular.module('geomeditApp')
 
     this.start = function(id, keepSelection) {
       if (!keepSelection) {
-        bd.propObj = null;
-        select.resetSelection();
+        this.resetSelection();
       }
 
       if (id === this.active()) {
@@ -56,6 +55,11 @@ angular.module('geomeditApp')
       }
 
       return changed;
+    };
+
+    this.resetSelection = function() {
+      bd.propObj = null;
+      select.resetSelection();
     };
 
   }]);

@@ -18,24 +18,36 @@ angular.module('geomeditApp')
         registerEvents:  false
       },
       initOptions: {
-        precision:    {
+        board:          {
+          ignoreLabels: false
+        },
+        label:          {
+          fixed: false
+        },
+        precision:      {
           hasPoint: 8
         },
-        point:        {
+        point:          {
           withLabel: false
         },
-        midpoint:     {
+        midpoint:       {
           size:      4,
           face:      '^',
           fillColor: 'none'
         },
-        intersection: {
+        intersection:   {
           face: 'x'
         },
-        glider:       {
+        glider:         {
           face:        'diamond',
           fillColor:   '#00dd00',
           strokeColor: '#00dd00'
+        },
+        polygon:        {
+          hasInnerPoints: true
+        },
+        regularPolygon: {
+          hasInnerPoints: true
         }
       },
       uiOptions:   {
@@ -50,27 +62,46 @@ angular.module('geomeditApp')
       propObj:     null,
       selection:   [],
       commands:    [],
+      cmdGroups:   [],
       command:     null,
-      create:      function(type, parents, attr) {
+
+      create: function(type, parents, attr) {
         return this.board.create(type, parents, attr);
       },
-      findCommand: function(id) {
-        var ret = null;
-        this.commands.forEach(function(cmd) {
-          if (cmd.id === id) {
-            ret = cmd;
+
+      findCommand:      function(id) {
+        var i, n;
+        for (i = 0, n = this.commands.length; i < n; i++) {
+          if (this.commands[i].id === id) {
+            return this.commands[i];
           }
-        });
-        return ret;
+        }
+        return null;
       },
-      addCommand:  function(cmd) {
-        if (cmd && JXG.isString(cmd.id)) {
+      findCommandGroup: function(name) {
+        var i, n;
+        for (i = 0, n = this.cmdGroups.length; i < n; i++) {
+          if (this.cmdGroups[i].name === name) {
+            return this.cmdGroups[i];
+          }
+        }
+        return null;
+      },
+      addCommand:       function(group, cmd) {
+        if (cmd && cmd.id && JXG.isString(cmd.id) && group && JXG.isString(group)) {
           var old = this.findCommand(cmd.id);
           if (old) {
             JXG.extend(old, cmd);
           }
           else {
             this.commands.push(cmd);
+
+            var groupObj = this.findCommandGroup(group);
+            if (!groupObj) {
+              groupObj = { name: group, commands: [] };
+              this.cmdGroups.push(groupObj);
+            }
+            groupObj.commands.push(cmd);
           }
         }
       }

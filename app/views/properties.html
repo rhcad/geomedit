@@ -2,17 +2,27 @@
 
 <div class="prop-item prop-head" ng-show="items.length > 0">
   <div>
-    <span>{{info().description}}</span>
-    <button type="button" class="btn btn-link prop-btn-s"
-            ng-click="clearSelection()">
+    <span>{{ (info().description|truncate:19) || ('PropBoard'|translate) }}</span>
+    <button type="button" class="btn btn-link prop-btn-s" ng-click="clearSelection()"
+            data-trigger="hover"
+            data-container="body"
+            data-title="{{!tooltip.show ? '' : 'ShowAllObjects'|translate}}"
+            bs-tooltip>
       <i class="fa fa-th-list"></i>
+    </button>
+    <button type="button" class="btn btn-link prop-btn-s" ng-click="switchVisible()" ng-show="info().elType"
+            data-trigger="hover"
+            data-container="body"
+            data-title="{{!tooltip.show ? '' : info().visible ? 'HideObject' : 'ShowObject' |translate}}"
+            bs-tooltip>
+      <i class="fa fa-{{info().visible ? 'eye' : 'eye-slash'}}"></i>
     </button>
   </div>
 </div>
 
 <div class="prop-item" ng-repeat="prop in items" ng-switch on="prop.type">
   <div class="prop-title">
-    <span>{{'Prop'+prop.title|translate|concatUnit:prop.unit:14}}:</span>
+    <span>{{'Prop_'+prop.id|camelCase|translate|concatUnit:prop.unit:14}}:</span>
 
     <span class="prop-value-right" ng-switch-default>{{prop.type}}?</span>
     <input type="text" ng-model="prop.value" ng-switch-when="text"/>
@@ -26,14 +36,21 @@
     <input type="number" min="{{prop.min||-10000}}" max="{{prop.max||10000}}" step="{{prop.step||1}}"
            ng-readonly="prop.readonly" ng-model="prop.value.size" ng-switch-when="size"/>
     <button ng-switch-when="size" type="button" class="btn btn-default prop-btn-s"
-            ng-model="prop.value.zoom" bs-checkbox>
+            ng-model="prop.value.zoom" bs-checkbox
+            data-trigger="hover"
+            data-container="body"
+            data-title="{{'PropZoomSize'|translate}}"
+            bs-tooltip>
       <i class="fa fa-search-plus"></i>
     </button>
 
     <!-- type: label -->
     <input type="text" ng-model="prop.value.name" ng-switch-when="label"/>
     <button ng-switch-when="label" type="button" class="btn btn-default prop-btn-s"
-            ng-model="prop.value.withLabel" bs-checkbox>
+            ng-model="prop.value.withLabel" bs-checkbox
+            data-trigger="hover"
+            data-title="{{!tooltip.show ? '' : prop.value.withLabel ? 'HideLabel' : 'ShowLabel' |translate}}"
+            bs-tooltip>
       <i class="fa fa-{{prop.value.withLabel ? 'eye' : 'eye-slash'}}"></i>
     </button>
 
@@ -47,19 +64,31 @@
 
     <!-- first line of coords type -->
     <button ng-switch-when="coords" type="button" class="btn btn-default prop-btn-m2"
-            ng-model="prop.value.snapToGrid" bs-checkbox>
+            ng-model="prop.value.snapToGrid" bs-checkbox
+            data-trigger="hover"
+            data-container="body"
+            data-title="{{'PropSnapToGrid'|translate}}"
+            bs-tooltip>
       <i class="fa fa-building-o"></i>
     </button>
     <button ng-switch-when="coords" type="button" class="btn btn-default prop-btn-m2"
-            ng-model="prop.value.snapToPoints" bs-checkbox>
+            ng-model="prop.value.snapToPoints" bs-checkbox
+            data-trigger="hover"
+            data-container="body"
+            data-title="{{'PropSnapToPoints'|translate}}"
+            bs-tooltip>
       <i class="fa fa-magnet"></i>
     </button>
 
     <!-- type: color -->
     <input type="text" ng-model="prop.value" ng-switch-when="color"/>
     <span class="color-box" ng-switch-when="color" ng-style="{borderColor:prop.value || transparent}"
-          ng-click="prop.expand=!prop.expand">
-      <i class="fa fa-{{prop.expand ? 'angle-double-up' : 'angle-double-down'}}"></i>
+          ng-click="prop.expand=!prop.expand"
+          data-trigger="hover"
+          data-container="body"
+          data-title="{{prop.expand ? 'PropHideColor' : 'PropExpandColor'|translate}}"
+          bs-tooltip>
+      <i class="fa fa-{{prop.expand ? 'angle-up' : 'angle-down'}}"></i>
     </span>
 
     <!-- type: face -->
@@ -75,14 +104,18 @@
 
   <div ng-switch-when="lineEndings">
     <span></span>
-    <button type="button" class="btn btn-default" ng-model="prop.value.arrowLast" bs-checkbox>
+    <button type="button" class="btn btn-default" ng-model="prop.value.arrowLast" bs-checkbox
+            data-trigger="hover" data-container="body" data-title="{{!tooltip.show ? '' : 'ArrowLast'|translate}}" bs-tooltip>
       <i class="fa fa-arrow-right"></i>
     </button>
-    <button type="button" class="btn btn-default" ng-model="prop.value.arrowFirst" bs-checkbox>
+    <button type="button" class="btn btn-default" ng-model="prop.value.arrowFirst" bs-checkbox
+            data-trigger="hover" data-container="body" data-title="{{!tooltip.show ? '' : 'ArrowFirst'|translate}}" bs-tooltip>
       <i class="fa fa-arrow-left"></i>
     </button>
-    <button type="button" class="btn btn-default" ng-model="prop.value.restrictLast" bs-checkbox>┥</button>
-    <button type="button" class="btn btn-default" ng-model="prop.value.restrictFirst" bs-checkbox>┝</button>
+    <button type="button" class="btn btn-default" ng-model="prop.value.restrictLast" bs-checkbox
+            data-trigger="hover" data-container="body" data-title="{{!tooltip.show ? '' : 'RestrictLast'|translate}}" bs-tooltip>┥</button>
+    <button type="button" class="btn btn-default" ng-model="prop.value.restrictFirst" bs-checkbox
+            data-trigger="hover" data-container="body" data-title="{{!tooltip.show ? '' : 'RestrictFirst'|translate}}" bs-tooltip>┝</button>
   </div>
 
   <div ng-switch-when="color" ng-hide="!prop.expand">
@@ -97,7 +130,7 @@
 
 <div class="prop-item" ng-show="items.length < 1" ng-repeat="obj in objects()">
   <div ng-mouseenter="highlight(obj, true)" ng-mouseleave="highlight(obj, false)">
-    <span ng-click="selectObject(obj)">{{ trimID(obj.id) + ' ' + obj.elType | truncate:20 }}</span>
+    <span ng-click="selectObject(obj)">{{ trimID(obj.id) + ' ' + obj.elType | truncate:16 }}</span>
     <button type="button" class="btn btn-default prop-btn-s"
             ng-click="removeObject(obj)">
       <i class="fa fa-trash-o"></i>
@@ -106,6 +139,18 @@
             ng-model="obj.visProp.visible" bs-checkbox
             ng-click="switchVisible(obj)">
       <i class="fa fa-{{obj.visProp.visible ? 'eye' : 'eye-slash'}}"></i>
+    </button>
+  </div>
+</div>
+<div class="prop-item" ng-show="items.length < 1">
+  <div>
+    <span ng-click="selectObject('board')">{{'PropBoard'|translate}}</span>
+    <button type="button" class="btn btn-default prop-btn-s"
+            ng-click="recreateBoard()"
+            data-trigger="hover"
+            data-title="{{'RecreateBoard'|translate}}"
+            bs-tooltip>
+      <i class="fa fa-trash-o"></i>
     </button>
   </div>
 </div>
