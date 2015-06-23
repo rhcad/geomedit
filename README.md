@@ -2,7 +2,7 @@
 
 An online geometry editor based on AngularJS and JSXGraph.
 
-[View online demos](http://rhcad.com/#/sketch).
+View online demos [on GitHub](http://rhcad.github.io/geomedit/#/sketch) or on [my site in China](http://rhcad.com/#/sketch).
 
 ![](doc/main.png)
 
