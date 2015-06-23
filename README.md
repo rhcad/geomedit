@@ -2,7 +2,7 @@
 
 An online geometry editor based on AngularJS and JSXGraph.
 
-View online demos [on GitHub](http://rhcad.github.io/geomedit/#/sketch) or on [my site in China](http://rhcad.com/#/sketch).
+[View online demos](http://rhcad.com/#/sketch).
 
 ![](doc/main.png)
 
@@ -11,6 +11,7 @@ View online demos [on GitHub](http://rhcad.github.io/geomedit/#/sketch) or on [m
 ## Features
 
  - [x] Multiple devices (iOS, Android and PC) and browsers.
+ - [x] Multiple languages (Chinese and English).
  - [x] Snapping points (vertex, glider, intersection and midpoint).
  - [x] Draw shapes interactively.
  - [x] Show and edit properties of shapes.
@@ -26,8 +27,6 @@ Run `grunt serve` for preview and `grunt build` for deploying.
 ## License
 
 This project is licensed under [GPL v3](http://www.gnu.org/licenses/gpl-3.0.html).
-
-Author: [Zhang Yungui](https://github.com/rhcad).
 
 ## Further reading
 
