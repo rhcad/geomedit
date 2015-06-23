@@ -6,6 +6,7 @@ angular.module('geomeditApp')
   .service('boardUI', ['board', 'eventHandler', 'select', function(bd, eventHandler, select) {
 
     this.initBoard = function(id) {
+      JXG.Options.axis = JXG.deepCopy(JXG.Options.axis, bd.initOptions.axis);
       bd.board = JXG.JSXGraph.initBoard(id, bd.initAttr);
       bd.board.moveOrigin(bd.board.canvasWidth / 2, bd.board.canvasHeight / 2);
       bd.board.options = JXG.deepCopy(bd.board.options, bd.initOptions);
@@ -35,15 +36,28 @@ angular.module('geomeditApp')
 
           bd.board.resizeContainer(w, h, false, true);
           bd.board.applyZoom();
-          if (xcSame && ycSame) {
-            bd.board.moveOrigin(bd.board.canvasWidth / 2, bd.board.canvasHeight / 2);
+          if (xcSame || ycSame) {
+            bd.board.moveOrigin(xcSame ? bd.board.canvasWidth / 2 : bd.board.origin.scrCoords[1],
+              ycSame ? bd.board.canvasHeight / 2 : bd.board.origin.scrCoords[2]);
           }
         }
       }
     };
 
-    function equals(a, b) {
-      return Math.abs(a - b) < 0.1;
+    this.zooms = {
+      zoomDefault: function() {
+        return bd.board.zoom100();
+      },
+      zoomIn:      function() {
+        return bd.board.zoomIn();
+      },
+      zoomOut:     function() {
+        return bd.board.zoomOut();
+      }
+    };
+
+    function equals(a, b, tol) {
+      return Math.abs(a - b) < JXG.def(tol, 1);
     }
 
   }]);

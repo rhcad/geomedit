@@ -147,12 +147,16 @@ angular.module('geomeditApp')
         });
         return ret;
       }
+      function isOrigin(el) {
+        return el.type === JXG.OBJECT_TYPE_AXISPOINT && JXG.cmpArrays(el.coords.usrCoords, [1, 0, 0]);
+      }
 
       if (!v.coords || !bd.board) {
         return;
       }
       bd.board.objectsList.forEach(function(el) {
-        if (el !== v.created && bd.drafts.indexOf(el) < 0 && el.visProp.visible && !hasDraftID(el.parents)) {
+        if (el !== v.created && bd.drafts.indexOf(el) < 0 && !hasDraftID(el.parents) &&
+          (el.visProp.visible || isOrigin(el))) {
           filter(el);
         }
       });
@@ -212,6 +216,10 @@ angular.module('geomeditApp')
     function _snapGlider(v) {
       v.hits.forEach(function(el) {
         var tmp, distAdd = v.snapSize / 2 + 1;
+
+        if (v.masks && v.masks.gliderFilter && !v.masks.gliderFilter(el)) {
+          return;
+        }
 
         if (v.glider && v.glider.slideObject === el) {
           tmp = v.glider;

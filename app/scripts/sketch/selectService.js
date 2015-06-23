@@ -103,14 +103,20 @@ angular.module('geomeditApp')
           }
           break;
       }
-      switch (obj.type) {
-        case JXG.OBJECT_TYPE_POLYGON:
-          newObj = obj.borders.map(function(line) { return createHighlightObject(line); });
-          break;
+      if (!newObj) {
+        switch (obj.type) {
+          case JXG.OBJECT_TYPE_POLYGON:
+            newObj = obj.borders.map(function(line) { return createHighlightObject(line); });
+            break;
 
-        case JXG.OBJECT_TYPE_TEXT:
-          createForCoords(obj.coords);
-          break;
+          case JXG.OBJECT_TYPE_TEXT:
+            createForCoords(obj.coords);
+            break;
+
+          case JXG.OBJECT_TYPE_TICKS:
+            newObj = createHighlightObject(obj.line);
+            break;
+        }
       }
 
       return newObj;

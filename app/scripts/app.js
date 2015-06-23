@@ -27,9 +27,12 @@ angular.module('geomeditApp', ['ui.router', 'ngAnimate', 'mgcrea.ngStrap', 'pasc
           controller:  'MainCtrl'
         })
         .state('sketch.toolbox', {
-          templateUrl: 'views/toolbox.html'
+          url:         '/tool',
+          templateUrl: 'views/toolbox.html',
+          controller:  'ToolboxCtrl'
         })
         .state('sketch.properties', {
+          url:         '/prop',
           templateUrl: 'views/properties.html',
           controller:  'PropCtrl'
         });

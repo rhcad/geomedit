@@ -27,7 +27,7 @@ angular.module('geomeditApp')
       if (bd.command) {
         (bd.command.cancelled || angular.noop)();
         bd.command = null;
-        motion.clearDrafts();
+        motion.clear();
       }
       return changed;
     };

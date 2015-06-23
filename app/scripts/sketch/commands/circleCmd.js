@@ -3,41 +3,10 @@
 'use strict';
 
 angular.module('geomeditApp')
-  .run(['board', 'motion', function(bd, motion) {
+  .run(['board', 'motion', 'cmdAux', function(bd, motion, cmdAux) {
 
-    function addCommand3p(id, type, group) {
-      function downHandler() {
-        if (!motion.hasDraftCoords()) {
-          motion.addDraftCoords();
-          motion.addDraftCoords();
-          bd.drafts.push(bd.create(type, motion.createDraftPoints(0, 1, 2)));
-        }
-        else if (motion.lastDraftCoordsIsNew()) {
-          motion.addDraftCoords();
-        }
-        else {
-          motion.updateDraftCoords();
-        }
-      }
-
-      function upHandler() {
-        if (motion.draftCoordsCount() === 3 && motion.lastDraftCoordsIsNew()) {
-          motion.submit(function() {
-            return bd.create(type, motion.createPoints());
-          });
-        }
-      }
-
-      bd.addCommand(group || 'circle', {
-        id:          id,
-        downHandler: downHandler,
-        upHandler:   upHandler
-      });
-    }
-
-    addCommand3p('circle3p', 'circumCircle');
-    addCommand3p('in_circle', 'incircle');
-    addCommand3p('in_center', 'incenter', 'point');
+    cmdAux.addCommand3p('', 'circle3p', 'circumCircle');
+    cmdAux.addCommand3p('', 'in_circle', 'incircle');
 
     (function() {
       function downHandler() {

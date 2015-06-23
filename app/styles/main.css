@@ -322,6 +322,10 @@ div button.pull-right {
   height: 26px;
 }
 
+.prop-item input[ng-switch-when=xy] {
+  width: 54px;
+}
+
 .color-box {
   width: 26px;
   height: 26px;
@@ -449,4 +453,42 @@ input[type=range]:focus::-ms-fill-upper {
 .btn-default:active:hover,
 .btn-default.active:hover {
   background-color: #ccc;
+}
+
+.pillbox-container {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  bottom: 0;
+  width: 0;
+}
+
+.zoom-container {
+  float: right;
+  -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.15);
+  box-shadow: 0 0 5px rgba(0,0,0,0.15);
+  border: 1px solid #ddd;
+  background: #f0f0f0;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+  width: 37px;
+  margin-bottom: 6px;
+  text-align: center;
+  color: #666;
+  font-size: 16px;
+  text-shadow: 0 1px #fff;
+}
+
+.zoom-container > div {
+  height: 35px;
+  line-height: 35px;
+}
+
+.zoom-container > div.active,
+.zoom-container > div:hover {
+  color: #000;
+}
+
+.zoom-container > :nth-child(n+2) {
+  border-top: 1px solid #ddd;
 }

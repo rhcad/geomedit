@@ -8,8 +8,8 @@ angular.module('geomeditApp')
       initAttr:    {
         originX:         100,
         originY:         400,
-        unitX:           50,
-        unitY:           50,
+        unitX:           20,
+        unitY:           20,
         keepAspectRatio: true,
         axis:            true,
         grid:            true,
@@ -20,6 +20,17 @@ angular.module('geomeditApp')
       initOptions: {
         board:          {
           ignoreLabels: false
+        },
+        axis:           {
+          label: {
+            position: 'rt',
+            offset:   [-10, -10]
+          },
+          ticks: {
+            insertTicks:   false,
+            ticksDistance: 5,
+            majorHeight:   30
+          }
         },
         label:          {
           fixed: false
@@ -53,7 +64,7 @@ angular.module('geomeditApp')
       uiOptions:   {
         highlightColor:   '#ddd',
         highlightSize:    12,
-        highlightOpacity: 0.8
+        highlightOpacity: 0.6
       },
       board:       null,
       drafts:      [],

@@ -3,37 +3,18 @@
 'use strict';
 
 angular.module('geomeditApp')
-  .run(['board', 'motion', function(bd, motion) {
-    function addCommand(id, type, attr) {
+  .run(['board', 'motion', 'cmdAux', function(bd, motion, cmdAux) {
 
-      function downHandler() {
-        if (!motion.hasDraftCoords()) {
-          motion.addDraftCoords();
-          motion.addDraftCoords();
-          bd.drafts.push(bd.create(type, motion.createDraftPoints(0, 1), attr));
-        }
-        else {
-          motion.updateDraftCoords();
-        }
-      }
+    cmdAux.addLineCommand('', 'segment', 'segment');
+    cmdAux.addLineCommand('', 'ray', 'line', { straightFirst: false });
+    cmdAux.addLineCommand('', 'line', 'line');
 
-      function upHandler() {
-        if (motion.lastDraftCoordsIsNew()) {
-          motion.submit(function() {
-            return bd.create(type, motion.createPoints(), attr);
-          });
-        }
-      }
+    cmdAux.addCommandSnapFirst('', 'parallel', { glider: true, gliderFilter: function(el) {
+      return el.elementClass === JXG.OBJECT_CLASS_LINE;
+    }}, function(start, endPt) {
+      return bd.create('parallel', [start.snapped, endPt]);
+    });
 
-      bd.addCommand('line', {
-        id:          id,
-        downHandler: downHandler,
-        upHandler:   upHandler
-      });
-    }
-
-    addCommand('segment', 'segment');
-    addCommand('ray', 'line', { straightFirst: false });
-    addCommand('line', 'line');
+    cmdAux.addCommand3p('line', 'bisector', 'bisector');
 
   }]);

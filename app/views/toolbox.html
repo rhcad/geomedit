@@ -1,4 +1,13 @@
 <div class="toolbox">
+  <div class="toolbox-group" ng-show="toolbox.active()" ng-controller="CmdContextCtrl">
+    <div class="toolbox-titlebar" ng-click="toolbox.cancel()">
+      <span>{{'Cmd_'+toolbox.active()|camelCase|translate}}</span>
+      <span data-trigger="hover" data-container="body" bs-tooltip
+            data-title="{{!tooltip.show ? '' : 'CancelCmd'|translate}}">
+        <i class="fa fa-times"></i></span>
+    </div>
+    <div ui-view></div>
+  </div>
   <div class="toolbox-group" ng-repeat="group in toolbox.groups()">
     <div class="toolbox-titlebar" ng-click="group.expand=!group.expand">
       <span>{{group.name|camelCase|translate}}</span>

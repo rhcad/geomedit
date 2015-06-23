@@ -3,31 +3,33 @@
 'use strict';
 
 angular.module('geomeditApp')
-  .controller('MainCtrl', ['$scope', '$state', 'localStorageService', 'header', 'commands', 'properties', 'options', 'boardUI',
-    function($scope, $state, localStorage, header, commands, properties, options, boardUI) {
+  .controller('MainCtrl', ['$scope', '$state', '$timeout', 'localStorageService', 'header',
+    'commands', 'properties', 'options', 'boardUI',
+    function($scope, $state, $timeout, localStorage, header, commands, properties, options, boardUI) {
 
       $scope.leftButtons = header.leftButtons;
       $scope.rightButtons = header.rightButtons;
       $scope.toolbox = commands;
       $scope.snap = options.snap;
-
+      $scope.zooms = boardUI.zooms;
       header.homeBtn.click = function() { $state.go('home'); };
-      header.cancelBtn.click = function() { commands.cancel(); };
-      header.cancelBtn.hide = function() { return header.cancelBtn.disabled(); };
-      header.dragBtn.hide = function() { return header.dragBtn.disabled(); };
 
       $scope.sidebar = {
         views:  [
           { state: 'toolbox',    icon: 'wrench' },
           { state: 'properties', icon: 'sliders' }
         ],
-        state:  localStorage.get('sideView'),
+        state:  '',
         hidden: localStorage.get('sidebarHidden'),
 
-        go: function(state) {
-          this.state = state;
-          $state.go('sketch.' + state);
-          localStorage.set('sideView', state);
+        go: function(state, notSave) {
+          if (this.state !== state) {
+            this.state = state;
+            if (!notSave) {
+              $state.go('sketch.' + state);
+              localStorage.set('sideView', state);
+            }
+          }
         },
         toggleVisible: function() {
           this.hidden = !this.hidden;
@@ -47,6 +49,8 @@ angular.module('geomeditApp')
       propState.onEnter = properties.onEnter;
       propState.onExit = properties.onExit;
 
-      $scope.sidebar.go($scope.sidebar.state || 'toolbox');
+      $timeout(function() {
+        $scope.sidebar.go($scope.sidebar.state || 'toolbox');
+      }, 50);
     }
   ]);

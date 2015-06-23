@@ -9,22 +9,41 @@ angular.module('geomeditApp')
           creators = {},
           data = {};
 
-      data.faces = [
-        { id: '', title: 'SelectOption' },
-        { id: 'o', title: 'FaceCircle' },
-        { id: 'x', title: 'FaceCross' },
-        { id: '+', title: 'FacePlus' },
-        { id: '<>', title: 'FaceDiamond' },
-        { id: '[]', title: 'FaceSquare' },
-        { id: '^', title: 'FaceUpTriangle' },
-        { id: 'v', title: 'FaceDownTriangle' },
-        { id: '<', title: 'FaceLeftTriangle' },
-        { id: '>', title: 'FaceRightTriangle' },
-      ];
-      data.colors = [
-        'none', '#000000', '#eeeeee', '#808080', '#ff00ff', '#cc0000',
-        '#ffa500', '#ffff00', '#3366ff', '#00ffff', '#006400', '#00ff00'
-      ];
+      data.options = {
+        faces:     [
+          { id: '', title: 'SelectOption' },
+          { id: 'o', title: 'FaceCircle' },
+          { id: 'x', title: 'FaceCross' },
+          { id: '+', title: 'FacePlus' },
+          { id: '<>', title: 'FaceDiamond' },
+          { id: '[]', title: 'FaceSquare' },
+          { id: '^', title: 'FaceUpTriangle' },
+          { id: 'v', title: 'FaceDownTriangle' },
+          { id: '<', title: 'FaceLeftTriangle' },
+          { id: '>', title: 'FaceRightTriangle' },
+        ],
+        positions: [
+          { id: '', title: 'SelectOption' },
+          { id: 'lft', title: 'PosLeft' },
+          { id: 'rt', title: 'PosRight' },
+          { id: 'top', title: 'PosCenter' },
+        ],
+        dashes:    [
+          { id: '', title: 'SelectOption' },
+          { id: '0', title: 'SolidLine' },
+          { id: '1', title: 'DottedLine' },
+          { id: '2', title: 'SmallDashes' },
+          { id: '3', title: 'MediumDashes' },
+          { id: '4', title: 'BigDashes' },
+          { id: '5', title: 'LargeGaps' },
+          { id: '6', title: 'SmallGaps' },
+        ],
+        colors:    [
+          'none', '#000000', '#eeeeee', '#808080', '#ff00ff', '#cc0000',
+          '#ffa500', '#ffff00', '#3366ff', '#00ffff', '#006400', '#00ff00'
+        ]
+      };
+
       data.id = '';
       data.items = [];
       data.updateView = angular.noop;
@@ -53,19 +72,21 @@ angular.module('geomeditApp')
         }
       });
 
+      data.validID = function(id) {
+        return id && id.indexOf('_') !== 0 && !id.match(/_ticks_\d+Label/) ? id : '';
+      };
+
       data.fetch = function() {
         var item, items = [], keys = [];
 
         if (JXG.isString(bd.propObj)) {
           data.id = bd.propObj;
-          if (bd.propObj === 'board') {
-            keys = ['ignoreLabels', 'canZoom', 'origin', 'unit'];
-          }
+          keys = getKeys(bd.propObj);
         }
         else {
           data.id = bd.propObj ? bd.propObj.id : '';
-          if (data.id) {
-            keys = getKeys(bd.propObj.elementClass, bd.propObj.type, bd.propObj.elType);
+          if (data.validID(data.id)) {
+            keys = getKeys(bd.propObj.elementClass, bd.propObj.type, bd.propObj.elType, bd.propObj);
           }
         }
 
@@ -99,58 +120,70 @@ angular.module('geomeditApp')
 
       data.save = function() {
         if (bd.propObj) {
-          var n = 0, r;
+          var r, changed = false;
           data.items.forEach(function(item) {
             if (JSON.stringify(item.value) !== JSON.stringify(item.oldValue)) {
               r = item.set();
-              if (r !== undefined && r !== false) {
-                item.oldValue = JXG.isObject(item.value) ? JXG.deepCopy({}, item.value) : item.value;
-                n++;
-              }
+              changed = changed || (r !== undefined && r !== false);
+              item.oldValue = JXG.isObject(item.value) ? JXG.deepCopy({}, item.value) : item.value;
             }
           });
-          if (n > 0) {
+          if (changed) {
             bd.board.update();
           }
         }
       };
 
-      function getKeys(elCls, objType, elType) {
+      function getKeys(elCls, objType, elType, el) {
         var items = ['label', 'fontSize', 'textColor', 'fixed', 'trace'];
 
-        if (elType === 'slider') {
+        if (elCls === 'board') {
+          items = ['ignoreLabels', 'grid', 'origin', 'units'];
+        }
+        else if (elType === 'slider') {
           items = ['range', 'snapWidth', 'face', 'size', 'label', 'fontSize', 'textColor',
             'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'];
         }
         else if (elCls === JXG.OBJECT_CLASS_POINT) {
           items = ['coords', 'face', 'size', 'color', 'opacity'].concat(items);
         }
-        else if (objType === JXG.OBJECT_TYPE_AXIS) {
-          items = ['strokeWidth', 'strokeColor', 'strokeOpacity', 'label', 'fontSize', 'textColor'];
-        }
         else if (elCls === JXG.OBJECT_CLASS_LINE) {
-          items = ['lineEndings', 'strokeWidth', 'strokeColor', 'strokeOpacity'].concat(items);
+          items = ['lineEndings', 'dash', 'strokeWidth', 'strokeColor', 'strokeOpacity'].concat(items);
         }
         else if (elCls === JXG.OBJECT_CLASS_CIRCLE) {
-          items = ['radius', 'centerVisible', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'].concat(items);
+          items = ['radius', 'centerVisible', 'dash', 'strokeWidth', 'strokeColor', 'strokeOpacity',
+            'fillColor', 'fillOpacity'].concat(items);
         }
         else if (objType === JXG.OBJECT_TYPE_POLYGON) {
-          items = ['strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'].concat(items);
+          items = ['dash', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'].concat(items);
         }
         else if (objType === JXG.OBJECT_TYPE_ANGLE) {
-          items = ['radius', 'label', 'fontSize', 'textColor', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'];
+          items = ['radius', 'label', 'fontSize', 'textColor', 'dash', 'strokeWidth', 'strokeColor',
+            'strokeOpacity', 'fillColor', 'fillOpacity'];
         }
         else if (objType === JXG.OBJECT_TYPE_SECTOR) {
-          items = ['label', 'fontSize', 'textColor', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'];
+          items = ['label', 'fontSize', 'textColor', 'dash', 'strokeWidth', 'strokeColor',
+            'strokeOpacity', 'fillColor', 'fillOpacity'];
         }
         else if (objType === JXG.OBJECT_TYPE_GRID) {
-          items = ['strokeWidth', 'strokeColor', 'strokeOpacity'];
+          items = ['dash', 'strokeWidth', 'strokeColor', 'strokeOpacity'];
         }
         else if (elCls === JXG.OBJECT_CLASS_CURVE) {
-          items = ['functionTerm', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'].concat(items);
+          items = ['functionTerm', 'dash', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'].concat(items);
         }
         else if (objType === JXG.OBJECT_TYPE_TEXT) {
           items = ['text', 'fontSize', 'textColor', 'fixed'];
+          if (el && el.getAttribute('isLabel') && !JXG.isPoint(el.element)) {
+            items.unshift('position', 'offset');
+          }
+        }
+        else if (objType === JXG.OBJECT_TYPE_TICKS) {
+          items = ['drawLabels', 'drawZero', 'insertTicks', 'majorHeight', 'scaleSymbol', 'ticksDistance', 'minorTicks'];
+        }
+
+        if (items.indexOf('label') > -1 && !el.label) {
+          items.splice(items.indexOf('fontSize'), 1);
+          items.splice(items.indexOf('textColor'), 1);
         }
 
         return items;
@@ -194,6 +227,18 @@ angular.module('geomeditApp')
         }
         return r;
       }
+
+      creators.dash = {
+        type: 'dash',
+        get:  function() {
+          this.value = bd.propObj.getAttribute('dash').toString();
+        },
+        set:  function() {
+          if (this.value) {
+            return setPolygonAttribute({ dash: parseInt(this.value) });
+          }
+        }
+      };
 
       creators.strokeOpacity = {
         type: 'range', unit: '%', min: 1, max: 100,
@@ -333,15 +378,38 @@ angular.module('geomeditApp')
         }
       };
 
-      creators.trace = {
-        type: 'checkbox',
-        get:  function() {
-          this.value = bd.propObj.getAttribute('trace');
-        },
-        set:  function() {
-          return bd.propObj.setAttribute({ trace: this.value });
-        }
-      };
+      function generateNumberProperty(name, attr) {
+        return JXG.deepCopy(JXG.deepCopy({type: 'number'}, attr || {}), {
+          get: function() {
+            this.value = bd.propObj.getAttribute(name);
+          },
+          set: function() {
+            if (isFloat(this.value, this.min, this.max)) {
+              var a = {};
+              a[name] = parseFloat(this.value);
+              return bd.propObj.setAttribute(a);
+            }
+          }
+        });
+      }
+
+      function generateBoolProperty(name, prop) {
+        return {
+          type: 'checkbox',
+          get:  function() {
+            var obj = prop ? bd.propObj[prop] : bd.propObj;
+            this.value = obj.getAttribute(name);
+          },
+          set:  function() {
+            var attr = {},
+                obj = prop ? bd.propObj[prop] : bd.propObj;
+            attr[name] = !!this.value;
+            return obj.setAttribute(attr);
+          }
+        };
+      }
+
+      creators.trace = generateBoolProperty('trace');
 
       function color2hex(c) {
         return (c && c !== 'none' && c.indexOf('#') < 0) ? JXG.rgb2hex(c) : c;
@@ -403,15 +471,7 @@ angular.module('geomeditApp')
         }
       };
 
-      creators.centerVisible = {
-        type: 'checkbox',
-        get:  function() {
-          this.value = bd.propObj.center.getAttribute('visible');
-        },
-        set:  function() {
-          return bd.propObj.center.setAttribute({ visible: this.value });
-        }
-      };
+      creators.centerVisible = generateBoolProperty('visible', 'center');
 
       creators.label = {
         type: 'label',
@@ -423,15 +483,22 @@ angular.module('geomeditApp')
         },
         set:  function() {
           this.value.name = this.value.name.replace(/(^\s*)|(\s*$)/g, '');
-          var withLabel = !!(this.value.withLabel && this.value.name);
+          var withLabel = !!(this.value.withLabel && this.value.name),
+              newLabel = !bd.propObj.label;
 
           if (this.value.name && this.value.name !== this.oldValue.name) {
-            bd.propObj.setName(this.value.name);
             withLabel = true;
             this.value.withLabel = true;
           }
           bd.propObj.setAttribute({ withLabel: withLabel });
-          if (withLabel && (!creators.fontSize.value || !creators.textColor.value)) {
+          if (this.value.name && this.value.name !== this.oldValue.name) {
+            bd.propObj.setName(this.value.name);
+            bd.propObj.label.setAttribute({ visible: true });
+          }
+          if (withLabel && newLabel) {
+            data.fetch();
+          }
+          else if (withLabel && (!creators.fontSize.value || !creators.textColor.value)) {
             creators.fontSize.get();
             creators.textColor.get();
             data.updateView();
@@ -440,10 +507,39 @@ angular.module('geomeditApp')
         }
       };
 
-      creators.fontSize = {
-        type:    'number', min: 1, max: 500, step: 0.5,
+      creators.position = {
+        type:    'position',
         get:     function() {
-          this.value = this.element() ? this.element().getAttribute('fontSize') : '';
+          var element = this.element();
+          this.value = element ? element.getAttribute('position') : '';
+        },
+        set:     function() {
+          var element = this.element();
+          return element && element.setAttribute({ position: this.value });
+        },
+        element: function() {
+          return !bd.propObj ? null : bd.propObj.label || bd.propObj;
+        }
+      };
+
+      creators.offset = {
+        type: 'xy', min: -200, max: 200, unit: 'px',
+        get:  function() {
+          var offset = bd.propObj.getAttribute('offset');
+          this.value = { x: offset[0], y: offset[1] };
+        },
+        set:  function() {
+          if (isFloat(this.value.x, this.min, this.max) && isFloat(this.value.y, this.min, this.max)) {
+            return bd.propObj.setAttribute({ offset: [parseInt(this.value.x), parseInt(this.value.y)] });
+          }
+        }
+      };
+
+      creators.fontSize = {
+        type:    'number', min: 8, max: 500, step: 0.5,
+        get:     function() {
+          var element = this.element();
+          this.value = element ? element.getAttribute('fontSize') : '';
         },
         set:     function() {
           var element = this.element();
@@ -452,22 +548,24 @@ angular.module('geomeditApp')
           }
         },
         element: function() {
-          return !bd.propObj ? null : bd.propObj.type === JXG.OBJECT_TYPE_TEXT ? bd.propObj : bd.propObj.label;
+          return !bd.propObj ? null : bd.propObj.label || bd.propObj;
         }
       };
 
       creators.textColor = {
         type:    'color',
         get:     function() {
-          this.value = this.element() ? this.element().getAttribute('strokeColor') : '';
+          var element = this.element();
+          this.value = element ? element.getAttribute('strokeColor') : '';
         },
         set:     function() {
-          if (this.element() && this.value) {
-            return this.element().setAttribute({ strokeColor: this.value });
+          var element = this.element();
+          if (element && this.value) {
+            return element.setAttribute({ strokeColor: this.value });
           }
         },
         element: function() {
-          return !bd.propObj ? null : bd.propObj.type === JXG.OBJECT_TYPE_TEXT ? bd.propObj : bd.propObj.label;
+          return !bd.propObj ? null : bd.propObj.label || bd.propObj;
         }
       };
 
@@ -482,16 +580,81 @@ angular.module('geomeditApp')
         }
       };
 
-      creators.canZoom = {
+      creators.grid = {
         type: 'checkbox',
         get:  function() {
-          this.value = bd.board.attr.zoom;
+          this.value = bd.board.grids.length > 0 && bd.board.grids[0].getAttribute('visible');
         },
         set:  function() {
-          bd.board.attr.zoom = !!this.value;
+          var attr = { visible: !!this.value };
+          bd.board.grids.forEach(function(el) {
+            el.setAttribute(attr);
+          });
           return true;
         }
       };
+
+      creators.origin = {
+        type: 'xy', min: 0, max: 2000, unit: 'px',
+        get:  function() {
+          this.value = {
+            x: bd.board.origin.scrCoords[1],
+            y: bd.board.origin.scrCoords[2]
+          };
+        },
+        set:  function() {
+          if ((!JXG.exists(this.value.x) || isFloat(this.value.x, this.min, this.max)) &&
+            (!JXG.exists(this.value.y) || isFloat(this.value.y, this.min, this.max))) {
+            var x = JXG.exists(this.value.x) ? parseInt(this.value.x) : bd.board.canvasWidth / 2,
+                y = JXG.exists(this.value.y) ? parseInt(this.value.y) : bd.board.canvasHeight / 2;
+            return bd.board.moveOrigin(x, y);
+          }
+        }
+      };
+
+      creators.units = {
+        type: 'xy', min: 1, max: 1000, unit: 'px',
+        get:  function() {
+          this.value = {
+            x: bd.board.unitX,
+            y: bd.board.unitY
+          };
+        },
+        set:  function() {
+          if (isFloat(this.value.x, this.min, this.max) && isFloat(this.value.y, this.min, this.max)) {
+            bd.board.unitX = parseFloat(this.value.x);
+            bd.board.unitY = parseFloat(this.value.y);
+            return bd.board.updateCoords().clearTraces().fullUpdate();
+          }
+        }
+      };
+
+      creators.majorHeight = {
+        type: 'checkbox',
+        get:  function() {
+          this.value = bd.propObj.getAttribute('majorHeight') < 0;
+        },
+        set:  function() {
+          var h = Math.abs(bd.propObj.getAttribute('majorHeight'));
+          return bd.propObj.setAttribute({ majorHeight: this.value ? -h : h });
+        }
+      };
+
+      creators.scaleSymbol = {
+        type: 'text',
+        get:  function() {
+          this.value = bd.propObj.getAttribute('scaleSymbol');
+        },
+        set:  function() {
+          return bd.propObj.setAttribute({ scaleSymbol: this.value });
+        }
+      };
+
+      creators.drawLabels = generateBoolProperty('drawLabels');
+      creators.drawZero = generateBoolProperty('drawZero');
+      creators.insertTicks = generateBoolProperty('insertTicks');
+      creators.ticksDistance = generateNumberProperty('ticksDistance', { min: 1, max: 50 });
+      creators.minorTicks = generateNumberProperty('minorTicks', { min: 0, max: 9 });
 
       return data;
     }]);

@@ -5,28 +5,35 @@
 angular.module('geomeditApp')
   .controller('PropCtrl', ['$scope', 'properties', 'board', 'select',
     function($scope, properties, bd, select) {
-      $scope.faces = properties.faces;
-      $scope.colors = properties.colors;
+      $scope.options = properties.options;
       $scope.items = properties.items;
+      $scope.sidebar.go('properties', true);
 
       $scope.trimID = function(id) {
         return id.replace(/.*Board\d*/, '');
       };
 
-      $scope.info = function() {
-        var ret = { id: properties.id };
-        if (bd.propObj && bd.propObj.elType) {
-          ret.elType = bd.propObj.elType;
-          ret.description = $scope.trimID(ret.id) + ': ' + ret.elType;
-          ret.visible = bd.propObj.getAttribute('visible');
+      $scope.info = function(obj) {
+        var ret = {};
+
+        obj = JXG.def(obj, bd.propObj);
+        if (obj && obj.getAttribute) {
+          ret.id = obj.id;
+          ret.type = obj.type;
+          ret.elType = obj.type === JXG.OBJECT_TYPE_AXISPOINT ? 'axispoint' :
+              obj.type === JXG.OBJECT_TYPE_TICKS ? 'ticks' : obj.elType;
+          ret.description = $scope.trimID(ret.id);
+          if (ret.description.indexOf(ret.elType) < 0) {
+            ret.description += ': ' + ret.elType;
+          }
+          ret.visible = obj.getAttribute('visible');
         }
         return ret;
       };
 
       $scope.objects = function() {
         var ret = (bd.board ? bd.board.objectsList : []).filter(function(obj) {
-          var id = $scope.trimID(obj.id);
-          return id.indexOf('_') !== 0 && !id.match(/_ticks_/);
+          return properties.validID($scope.trimID(obj.id));
         });
         return ret.reverse();
       };

@@ -52,7 +52,9 @@ angular.module('geomeditApp')
     };
 
     this.addDraftCoords = function(snapMasks) {
-      return bd.snaps.push(snap.snapCoords(this.pt, null, snapMasks));
+      var r = snap.snapCoords(this.pt, null, snapMasks);
+      bd.snaps.push(r);
+      return r;
     };
 
     this.draftCoordsCount = function() {

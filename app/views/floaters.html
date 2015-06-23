@@ -9,3 +9,31 @@
     <i class="fa fa-angle-right"></i>
   </span>
 </div>
+<div class="pillbox-container">
+  <div class="zoom-container">
+    <div ng-click="zooms.zoomIn()"
+         data-trigger="hover"
+         data-placement="left"
+         data-container="body"
+         data-title="{{!tooltip.show ? '' : 'ZoomIn'|translate}}"
+         bs-tooltip>
+      <i class="fa fa-plus"></i>
+    </div>
+    <div ng-click="zooms.zoomOut()"
+         data-trigger="hover"
+         data-placement="left"
+         data-container="body"
+         data-title="{{!tooltip.show ? '' : 'ZoomOut'|translate}}"
+         bs-tooltip>
+      <i class="fa fa-minus"></i>
+    </div>
+    <div ng-click="zooms.zoomDefault()"
+         data-trigger="hover"
+         data-placement="left"
+         data-container="body"
+         data-title="{{!tooltip.show ? '' : 'ZoomDefault'|translate}}"
+         bs-tooltip>
+      <i class="fa fa-home"></i>
+    </div>
+  </div>
+</div>

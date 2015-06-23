@@ -34,12 +34,6 @@ angular.module('geomeditApp')
           click:   function(scope) { scope.showOptionsPopover(); }
         };
 
-    this.cancelBtn = {
-      tooltip:  'CancelCmd',
-      icon:     'times-circle',
-      disabled: function() { return !board.command; }
-    };
-
     this.dragBtn = {
       tooltip:  'DraggingMode',
       icon:     'arrows',

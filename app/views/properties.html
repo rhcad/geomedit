@@ -91,9 +91,23 @@
       <i class="fa fa-{{prop.expand ? 'angle-up' : 'angle-down'}}"></i>
     </span>
 
+    <!-- type: xy -->
+    <input type="number" min="{{prop.min||-1000}}" max="{{prop.max||1000}}" step="{{prop.step||1}}"
+           ng-model="prop.value.y" ng-switch-when="xy"/>
+    <input type="number" min="{{prop.min||-1000}}" max="{{prop.max||1000}}" step="{{prop.step||1}}"
+           ng-model="prop.value.x" ng-switch-when="xy"/>
+
     <!-- type: face -->
     <select ng-model="prop.value" ng-switch-when="face"
-            ng-options="f.id as f.title|translate for f in faces"></select>
+            ng-options="f.id as f.title|translate for f in options.faces"></select>
+
+    <!-- type: position -->
+    <select ng-model="prop.value" ng-switch-when="position"
+            ng-options="p.id as p.title|translate for p in options.positions"></select>
+
+    <!-- type: dash -->
+    <select ng-model="prop.value" ng-switch-when="dash"
+            ng-options="p.id as p.title|translate for p in options.dashes"></select>
   </div>
 
   <div ng-switch-when="coords">
@@ -121,7 +135,7 @@
   <div ng-switch-when="color" ng-hide="!prop.expand">
     <span></span>
     <div class="prop-color-group">
-      <div ng-repeat="c in colors" class="prop-color prop-color-{{$index}}" ng-click="prop.value=c"
+      <div ng-repeat="c in options.colors" class="prop-color prop-color-{{$index}}" ng-click="prop.value=c"
            ng-class="{active: prop.value===c}" ng-style="{backgroundColor: c}"></div>
     </div>
   </div>
@@ -130,7 +144,7 @@
 
 <div class="prop-item" ng-show="items.length < 1" ng-repeat="obj in objects()">
   <div ng-mouseenter="highlight(obj, true)" ng-mouseleave="highlight(obj, false)">
-    <span ng-click="selectObject(obj)">{{ trimID(obj.id) + ' ' + obj.elType | truncate:16 }}</span>
+    <span ng-click="selectObject(obj)">{{ info(obj).description | truncate:16 }}</span>
     <button type="button" class="btn btn-default prop-btn-s"
             ng-click="removeObject(obj)">
       <i class="fa fa-trash-o"></i>
