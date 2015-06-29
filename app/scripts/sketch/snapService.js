@@ -1,128 +1,135 @@
 // Copyright (c) 2015 Zhang Yungui (https://github.com/rhcad/geomedit/), GPL licensed.
 
-'use strict';
-
 angular.module('geomeditApp')
-  .service('snap', ['board', 'options', function(bd, options) {
+  .service('snap', ['model', function(model) {
+    'use strict';
 
-    function makeParam(coords, masks) {
-      var snapSize = bd.board.options.precision.hasPoint;
+    function makeParam(coords, masks, lastSnap) {
+      var snapSize = model.board.options.precision.hasPoint;
+      if (masks && masks.gliderFilter) {
+        masks.glider = true;
+      }
       return {
-        coords:   coords,
-        hits:     [],
-        masks:    masks,
+        coords: coords,
+        hits: [],
+        draftIDs: getDraftIDs(),
+        masks: masks || lastSnap && lastSnap.masks,
         snapSize: snapSize,
-        minDist:  snapSize,
-        dist:     0,
-        snapped:  null,
-        glider:   null
+        minDist: snapSize,
+        dist: 0,
+        snapped: null,
+        glider: null
       };
     }
 
-    this.snapCoords = function(coords, lastSnap, masks) {
-      var v = makeParam(coords, masks),
-          oldSnapSize,
-          snap = options.snap;
-
-      JXG.extend(v, {
-        draftIDs: getDraftIDs(),
-        mid:      null,
-        cross:    null,
-        created:  lastSnap ? lastSnap.glider : null,
-        glider:   lastSnap ? lastSnap.glider : null
-      });
-
-      if (lastSnap) {
-        if (lastSnap.created && !lastSnap.glider) {
-          bd.board.removeObject(lastSnap.created);
+    function makeResult(v) {
+      function check(el) {
+        return el && el.coords ? el : null;
+      }
+      if (v.glider && (v.mid || v.cross || v.glider.slideObject !== v.snapped)) {
+        if (v.created === v.glider) {
+          v.created = null;
         }
-        v.masks = masks || lastSnap.masks;
+        model.board.removeObject(v.glider);
+        v.glider = null;
       }
-      if (v.masks) {
-        oldSnapSize = bd.board.options.precision.hasPoint;
-        v.snapSize = Math.max(v.snapSize, 60);
-        v.minDist = v.snapSize;
-        bd.board.options.precision.hasPoint = v.snapSize;
-
-        snap.vertex = snap.vertex || v.masks.vertex;
-        snap.mid = snap.mid || v.masks.mid;
-        snap.cross = snap.cross || v.masks.cross;
-        snap.glider = snap.glider || v.masks.glider;
+      v.created = v.mid || v.cross || v.glider || v.created;
+      if (v.oldSnapSize) {
+        model.board.options.precision.hasPoint = v.oldSnapSize;
       }
+      return {
+        coords: (check(v.created) || check(v.snapped) || v).coords,
+        created: v.created,
+        snapped: v.snapped,
+        mid: v.mid,
+        cross: v.cross,
+        glider: v.glider,
+        masks: v.masks,
+        clear: function() {
+          if (this.created) {
+            model.board.removeObject(this.created);
+            this.created = null;
+            this.mid = null;
+            this.cross = null;
+            this.glider = null;
+          }
+          this.snapped = null;
+        },
+        detach: function() {
+          var ret = this.created;
+          this.created = null;
+          this.mid = null;
+          this.cross = null;
+          this.glider = null;
+          this.snapped = null;
+          return ret;
+        }
+      };
+    }
 
+    function doSnapCoords(v, snap) {
       if (v.masks && JXG.isFunction(v.masks.filter)) {
         gatherHits(v);
         v.masks.filter(v);
       }
       else {
-        if (options.snap.vertex && (!v.masks || v.masks.vertex)) {
-          _snapPoint(v);
+        if (snap.point) {
+          doSnapPoint(v);
         }
         if (v.minDist > v.snapSize / 4) {
           gatherHits(v);
-          if (options.snap.mid && (!v.masks || v.masks.mid)) {
-            _snapMidPoint(v);
+          if (snap.mid) {
+            doSnapMidPoint(v);
           }
-          if (options.snap.cross && !v.mid && (!v.masks || v.masks.cross)) {
-            _snapCross(v);
+          if (snap.cross) {
+            doSnapCross(v);
           }
-          if (options.snap.glider && !v.snapped && (!v.masks || v.masks.glider)) {
-            _snapGlider(v);
+          if (snap.glider) {
+            doSnapGlider(v);
           }
         }
       }
+    }
 
-      if (v.glider && (v.mid || v.cross || v.glider.slideObject !== v.snapped)) {
-        bd.board.removeObject(v.glider);
-        v.glider = null;
+    this.snapCoords = function(coords, lastSnap, masks) {
+      var v = makeParam(coords, masks, lastSnap),
+          snap = v.masks || model.snap;
+
+      JXG.extend(v, {
+        mid: null,
+        cross: null,
+        created: lastSnap ? lastSnap.glider : null,
+        glider: lastSnap ? lastSnap.glider : null
+      });
+
+      if (lastSnap && lastSnap.created && !lastSnap.glider) {
+        model.board.removeObject(lastSnap.created);
       }
-      v.created = v.mid || v.cross || v.glider || v.created;
-      if (oldSnapSize) {
-        bd.board.options.precision.hasPoint = oldSnapSize;
+      if (v.masks) {
+        v.oldSnapSize = model.board.options.precision.hasPoint;
+        v.snapSize = Math.max(v.snapSize, 60);
+        v.minDist = v.snapSize;
+        model.board.options.precision.hasPoint = v.snapSize;
       }
 
-      return {
-        coords:  (v.created || v.snapped || v).coords,
-        created: v.created,
-        snapped: v.snapped,
-        mid:     v.mid,
-        cross:   v.cross,
-        glider:  v.glider,
-        masks:   v.masks,
-        clear:   function() {
-          if (v.created) {
-            bd.board.removeObject(v.created);
-            v.created = null;
-            v.mid = null;
-            v.cross = null;
-            v.glider = null;
-          }
-          v.snapped = null;
-        },
-        detach:  function() {
-          var ret = v.created;
-          v.created = null;
-          v.mid = null;
-          v.cross = null;
-          v.glider = null;
-          v.snapped = null;
-          return ret;
-        }
-      };
+      doSnapCoords(v, snap);
+      return makeResult(v);
     };
 
-    this.hitTest = function(coords) {
-      var v = makeParam(coords);
+    this.hitTest = function(coords, masks) {
+      var v = makeParam(coords, masks);
 
-      _snapPoint(v);
-      if (v.minDist > v.snapSize / 4) {
+      if (!masks || masks.point) {
+        doSnapPoint(v);
+      }
+      if (v.minDist > v.snapSize / 4 && (!masks || masks.glider)) {
         gatherHits(v);
         if (v.hits.length === 1) {
           v.snapped = v.hits[0];
         }
         else if (v.hits.length > 1) {
-          _snapGlider(v);
-          bd.board.removeObject(v.glider);
+          doSnapGlider(v);
+          model.board.removeObject(v.glider);
         }
       }
 
@@ -130,8 +137,10 @@ angular.module('geomeditApp')
     };
 
     function getDraftIDs() {
-      var ids = bd.drafts.map(function(el) { return el.id; });
-      bd.snaps.forEach(function(item) {
+      var ids = model.drafts.map(function(el) {
+        return el.id;
+      });
+      model.snaps.forEach(function(item) {
         if (item.created) {
           ids.push(item.created.id);
         }
@@ -140,48 +149,66 @@ angular.module('geomeditApp')
     }
 
     function scanObjects(v, filter) {
-      function hasDraftID(ids) {
-        var ret = false;
-        ids.forEach(function(id) {
+      function hasDraftID(el) {
+        var ret = v.draftIDs && v.draftIDs.indexOf(el.id) >= 0;
+        el.parents.forEach(function(id) {
           ret = ret || v.draftIDs && v.draftIDs.indexOf(id) >= 0;
         });
         return ret;
       }
+
       function isOrigin(el) {
         return el.type === JXG.OBJECT_TYPE_AXISPOINT && JXG.cmpArrays(el.coords.usrCoords, [1, 0, 0]);
       }
 
-      if (!v.coords || !bd.board) {
+      if (!v.coords || !model.board) {
         return;
       }
-      bd.board.objectsList.forEach(function(el) {
-        if (el !== v.created && bd.drafts.indexOf(el) < 0 && !hasDraftID(el.parents) &&
-          (el.visProp.visible || isOrigin(el))) {
+      model.board.objectsList.forEach(function(el) {
+        var checkObj = el !== v.created && model.drafts.indexOf(el) < 0;
+        if (checkObj && !hasDraftID(el) && (el.visProp.visible || isOrigin(el))) {
           filter(el);
         }
       });
     }
 
     function gatherHits(v) {
-      function canHasGlider(cls) {
-        return cls === JXG.OBJECT_CLASS_LINE ||
-          cls === JXG.OBJECT_CLASS_CIRCLE || cls === JXG.OBJECT_CLASS_CURVE;
+      function canHasGlider(el) {
+        var c = el.elementClass;
+        return (c === JXG.OBJECT_CLASS_LINE || c === JXG.OBJECT_CLASS_CIRCLE ||
+          c === JXG.OBJECT_CLASS_CURVE || el.borders) && !gliderFilter(v, el);
       }
+
       function canSnapPoints(el) {
-        return v.masks && v.masks.filter && JXG.isPoint(el);
+        return v.masks && JXG.isFunction(v.masks.filter) && JXG.isPoint(el);
+      }
+
+      function hasPoint(el, x, y) {
+        var r = el.hasPoint(x, y);
+        if (!r && el.type === JXG.OBJECT_TYPE_POLYGON && el.visProp.hasinnerpoints) {
+          el.visProp.hasinnerpoints = false;
+          r = el.hasPoint(x, y);
+          el.visProp.hasinnerpoints = true;
+        }
+        return r;
       }
 
       scanObjects(v, function(el) {
-        if ( (canSnapPoints(el) || canHasGlider(el.elementClass)) &&
-          el.hasPoint(v.coords.scrCoords[1], v.coords.scrCoords[2])) {
+        if ((canSnapPoints(el) || canHasGlider(el)) &&
+          hasPoint(el, v.coords.scrCoords[1], v.coords.scrCoords[2])) {
           v.hits.push(el);
         }
       });
     }
 
-    function _snapPoint(v) {
+    function pointFilter(v, el) {
+      return v.masks && JXG.isFunction(v.masks.pointFilter) && !v.masks.pointFilter(el);
+    }
+
+    function doSnapPoint(v) {
       scanObjects(v, function(el) {
-        if (JXG.isPoint(el) && el.hasPoint(v.coords.scrCoords[1], v.coords.scrCoords[2])) {
+        if (JXG.isPoint(el) && el.hasPoint(v.coords.scrCoords[1], v.coords.scrCoords[2]) &&
+          !pointFilter(v, el)) {
           v.dist = el.coords.distance(JXG.COORDS_BY_SCREEN, v.coords);
           if (v.minDist > v.dist) {
             v.minDist = v.dist;
@@ -191,33 +218,44 @@ angular.module('geomeditApp')
       });
     }
 
-    function _snapMidPoint(v) {
+    function isSegment(el) {
+      var line = el && el.elementClass === JXG.OBJECT_CLASS_LINE;
+      return line && !el.straightFirst && !el.straightLast && !el.visProp.lastarrow;
+    }
+
+    this.isSegment = isSegment;
+
+    function doSnapMidPoint(v) {
       var tmp;
       v.hits.forEach(function(el) {
-        if (el.elementClass === JXG.OBJECT_CLASS_LINE && !el.straightFirst && !el.straightLast && !el.visProp.lastarrow) {
-          tmp = bd.create('midpoint', [el], bd.board.options.midpoint);
+        if (isSegment(el)) {
+          tmp = model.create('midpoint', [el], model.board.options.midpoint);
 
           v.dist = tmp.coords.distance(JXG.COORDS_BY_SCREEN, v.coords);
           if (v.minDist > v.dist) {
             v.minDist = v.dist;
             v.snapped = el;
             if (v.mid) {
-              bd.board.removeObject(v.mid);
+              model.board.removeObject(v.mid);
             }
             v.mid = tmp;
           }
           else {
-            bd.board.removeObject(tmp);
+            model.board.removeObject(tmp);
           }
         }
       });
     }
 
-    function _snapGlider(v) {
+    function gliderFilter(v, el) {
+      return v.masks && JXG.isFunction(v.masks.gliderFilter) && !v.masks.gliderFilter(el);
+    }
+
+    function doSnapGlider(v) {
       v.hits.forEach(function(el) {
         var tmp, distAdd = v.snapSize / 2 + 1;
 
-        if (v.masks && v.masks.gliderFilter && !v.masks.gliderFilter(el)) {
+        if (gliderFilter(v, el)) {
           return;
         }
 
@@ -227,7 +265,7 @@ angular.module('geomeditApp')
           distAdd = 1;
         }
         else {
-          tmp = bd.create('glider', v.coords.usrCoords.slice(1).concat(el));
+          tmp = model.create('glider', v.coords.usrCoords.slice(1).concat(el));
         }
 
         v.dist = tmp.coords.distance(JXG.COORDS_BY_SCREEN, v.coords) + distAdd;
@@ -235,54 +273,63 @@ angular.module('geomeditApp')
           v.minDist = v.dist;
           v.snapped = el;
           if (v.glider && v.glider !== tmp) {
-            bd.board.removeObject(v.glider);
+            model.board.removeObject(v.glider);
           }
           v.glider = tmp;
         }
         else if (tmp !== v.glider) {
-          bd.board.removeObject(tmp);
+          model.board.removeObject(tmp);
         }
       });
     }
 
-    function _snapCross(v) {
-      var lineOrCircle = function(el) {
-        return el.elementClass === JXG.OBJECT_CLASS_LINE || el.elementClass === JXG.OBJECT_CLASS_CIRCLE;
-      }, tmp, tmp2, d2;
+    function lineOrCircle(el) {
+      return el.elementClass === JXG.OBJECT_CLASS_LINE || el.elementClass === JXG.OBJECT_CLASS_CIRCLE;
+    }
+
+    function checkSecondCross(v, el1, el2) {
+      if (el1.elementClass === JXG.OBJECT_CLASS_CIRCLE || el2.elementClass === JXG.OBJECT_CLASS_CIRCLE) {
+        var tmp2 = model.create('intersection', [el1, el2, 1]),
+            d2 = tmp2.coords.distance(JXG.COORDS_BY_SCREEN, v.coords);
+        if (v.dist > d2) {
+          v.dist = d2;
+          return tmp2;
+        }
+        else {
+          model.board.removeObject(tmp2);
+        }
+      }
+    }
+
+    function doSnapCross(v) {
+      var tmp, tmp2, invalidIntersection = [0, 0, 0];
 
       v.hits.forEach(function(el1, i) {
         v.hits.forEach(function(el2, j) {
           if (i > j && lineOrCircle(el1) && lineOrCircle(el2)) {
-            tmp = bd.create('intersection', [el1, el2, 0]);
-            if (JXG.cmpArrays(tmp.coords.usrCoords, [0, 0, 0])) {
-              bd.board.removeObject(tmp);
+            tmp = model.create('intersection', [el1, el2, 0]);
+            if (JXG.cmpArrays(tmp.coords.usrCoords, invalidIntersection)) {
+              model.board.removeObject(tmp);
               return;
             }
 
             v.dist = tmp.coords.distance(JXG.COORDS_BY_SCREEN, v.coords);
-            if (el1.elementClass === JXG.OBJECT_CLASS_CIRCLE || el2.elementClass === JXG.OBJECT_CLASS_CIRCLE) {
-              tmp2 = bd.create('intersection', [el1, el2, 1]);
-              d2 = tmp2.coords.distance(JXG.COORDS_BY_SCREEN, v.coords);
-              if (v.dist > d2) {
-                v.dist = d2;
-                bd.board.removeObject(tmp);
-                tmp = tmp2;
-              }
-              else {
-                bd.board.removeObject(tmp2);
-              }
+            tmp2 = checkSecondCross(v, el1, el2);
+            if (tmp2) {
+              model.board.removeObject(tmp);
+              tmp = tmp2;
             }
 
             if (v.minDist > v.dist) {
               v.minDist = v.dist;
               v.snapped = el1;
               if (v.cross) {
-                bd.board.removeObject(v.cross);
+                model.board.removeObject(v.cross);
               }
               v.cross = tmp;
             }
             else {
-              bd.board.removeObject(tmp);
+              model.board.removeObject(tmp);
             }
           }
         });

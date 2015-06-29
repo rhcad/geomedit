@@ -1,15 +1,14 @@
 // Copyright (c) 2015 Zhang Yungui (https://github.com/rhcad/geomedit/), GPL licensed.
 
-'use strict';
-
 angular.module('geomeditApp')
-  .service('commands', ['board', 'motion', 'select', function(bd, motion, select) {
+  .service('commands', ['model', 'motion', 'select', function(model, motion, select) {
+    'use strict';
     var _cmdCount = 0, _groups = null;
 
     this.groups = function() {
-      if (_cmdCount !== bd.commands.length) {
-        _cmdCount = bd.commands.length;
-        _groups = bd.cmdGroups.map(function(group) {
+      if (_cmdCount !== model.commands.length) {
+        _cmdCount = model.commands.length;
+        _groups = model.cmdGroups.map(function(group) {
           return { name: group.name, commands: group.commands.map(function(cmd) {
             return cmd.id;
           })};
@@ -19,14 +18,16 @@ angular.module('geomeditApp')
     };
 
     this.active = function() {
-      return bd.command ? bd.command.id : '';
+      return model.command ? model.command.id : '';
     };
 
     this.cancel = function() {
-      var changed = !!bd.command;
-      if (bd.command) {
-        (bd.command.cancelled || angular.noop)();
-        bd.command = null;
+      var changed = !!model.command;
+      if (model.command) {
+        (model.command.cancelled || angular.noop)();
+        model.command = null;
+        model.context.tip = null;
+        model.context.input = null;
         motion.clear();
       }
       return changed;
@@ -37,17 +38,12 @@ angular.module('geomeditApp')
         this.resetSelection();
       }
 
-      if (id === this.active()) {
-        return this.cancel();
-      }
-
       var changed = this.cancel();
 
-      bd.command = bd.findCommand(id);
-      if (bd.command) {
-        var res = (bd.command.inited || angular.noop)();
-        if (typeof res === 'boolean' && !res) {
-          bd.command = null;
+      model.command = model.findCommand(id);
+      if (model.command) {
+        if (JXG.isFalse((model.command.inited || angular.noop)())) {
+          model.command = null;
         }
         else {
           changed = true;
@@ -58,7 +54,7 @@ angular.module('geomeditApp')
     };
 
     this.resetSelection = function() {
-      bd.propObj = null;
+      model.propObj = null;
       select.resetSelection();
     };
 

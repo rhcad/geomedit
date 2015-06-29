@@ -5,20 +5,24 @@
   text-decoration: underline; }
 .home-reverse {
   color: #ccc;
+  font-size: 0.85rem;
+}
+html {
+  font-size: 16px;
 }
 
 .home-btn {
   display: inline-block;
-  margin-bottom: 1em;
+  margin-bottom: 1rem;
   color: rgba(255, 255, 255, 0.7);
   background-color: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.2);
   border-style: solid;
   border-width: 1px;
-  border-radius: 0.3em;
+  border-radius: 0.3rem;
   transition: color 0.2s, background-color 0.2s, border-color 0.2s; }
 .home-btn + .home-btn {
-  margin-left: 1em; }
+  margin-left: 1rem; }
 
 .home-btn:hover {
   color: rgba(255, 255, 255, 0.8);
@@ -26,23 +30,23 @@
   background-color: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.3); }
 
-@media screen and (min-width: 64em) {
+@media screen and (min-width: 32rem) {
   .home-btn {
-    padding: 0.75rem 1em; } }
+    padding: 0.75rem 1rem; } }
 
-@media screen and (min-width: 42em) and (max-width: 64em) {
+@media screen and (min-width: 21rem) and (max-width: 64rem) {
   .home-btn {
-    padding: 0.6rem 0.9em;
-    font-size: 0.9em; } }
+    padding: 0.6rem 0.9rem;
+    font-size: 0.9rem; } }
 
-@media screen and (max-width: 42em) {
+@media screen and (max-width: 21rem) {
   .home-btn {
     display: block;
     width: 100%;
-    padding: 0.75em;
-    font-size: 0.9em; }
+    padding: 0.75rem;
+    font-size: 0.9rem; }
   .home-btn + .home-btn {
-    margin-top: 1em;
+    margin-top: 1rem;
     margin-left: 0; } }
 
 .home-header {
@@ -54,53 +58,52 @@
   line-height: 1.5;
   color: #fff;
   text-align: center;
-  background-color: #159957;
-  background-image: linear-gradient(120deg, #155799, #159957); }
+  background-color: #19737b; }
 
-@media screen and (min-width: 64em) {
+@media screen and (min-width: 64rem) {
   .home-header {
-    padding: 5rem 6em; } }
+    padding: 5rem 6rem; } }
 
-@media screen and (min-width: 42em) and (max-width: 64em) {
+@media screen and (min-width: 42rem) and (max-width: 64rem) {
   .home-header {
-    padding: 3rem 4em; } }
+    padding: 3rem 4rem; } }
 
-@media screen and (max-width: 42em) {
+@media screen and (max-width: 42rem) {
   .home-header {
-    padding: 2rem 1em; } }
+    padding: 2rem 1rem; } }
 
 .project-name {
   margin-top: 0;
-  margin-bottom: 0.1em; }
+  margin-bottom: 0.1rem; }
 
-@media screen and (min-width: 64em) {
+@media screen and (min-width: 64rem) {
   .project-name {
-    font-size: 3.25em; } }
+    font-size: 3.25rem; } }
 
-@media screen and (min-width: 42em) and (max-width: 64em) {
+@media screen and (min-width: 42rem) and (max-width: 64rem) {
   .project-name {
-    font-size: 2.25em; } }
+    font-size: 2.25rem; } }
 
-@media screen and (max-width: 42em) {
+@media screen and (max-width: 42rem) {
   .project-name {
-    font-size: 1.75em; } }
+    font-size: 1.75rem; } }
 
 .project-tagline {
-  margin-bottom: 2em;
+  margin-bottom: 2rem;
   font-weight: normal;
   opacity: 0.7; }
 
-@media screen and (min-width: 64em) {
+@media screen and (min-width: 64rem) {
   .project-tagline {
-    font-size: 1.25em; } }
+    font-size: 1.25rem; } }
 
-@media screen and (min-width: 42em) and (max-width: 64em) {
+@media screen and (min-width: 42rem) and (max-width: 64rem) {
   .project-tagline {
-    font-size: 1.15em; } }
+    font-size: 1.15rem; } }
 
-@media screen and (max-width: 42em) {
+@media screen and (max-width: 42rem) {
   .project-tagline {
-    font-size: 1em; } }
+    font-size: 1rem; } }
 
 .home-lang {
   position: absolute;
@@ -113,49 +116,49 @@
 .main-content img {
   max-width: 100%; }
 .main-content h1, .main-content h2, .main-content h3, .main-content h4, .main-content h5, .main-content h6 {
-  margin-top: 2em;
-  margin-bottom: 1em;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
   font-weight: normal;
   color: #159957; }
 .main-content p {
-  margin-bottom: 1em; }
+  margin-bottom: 1rem; }
 .main-content code {
   padding: 2px 4px;
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  font-size: 0.9em;
+  font-size: 0.9rem;
   color: #383e41;
   background-color: #f3f6fa;
-  border-radius: 0.3em; }
+  border-radius: 0.3rem; }
 .main-content pre {
-  padding: 0.8em;
+  padding: 0.8rem;
   margin-top: 0;
-  margin-bottom: 1em;
+  margin-bottom: 1rem;
   font: 1rem Consolas, "Liberation Mono", Menlo, Courier, monospace;
   color: #567482;
   word-wrap: normal;
   background-color: #f3f6fa;
   border: solid 1px #dce6f0;
-  border-radius: 0.3em; }
+  border-radius: 0.3rem; }
 .main-content pre > code {
   padding: 0;
   margin: 0;
-  font-size: 0.9em;
+  font-size: 0.9rem;
   color: #567482;
   word-break: normal;
   white-space: pre;
   background: transparent;
   border: 0; }
 .main-content .highlight {
-  margin-bottom: 1em; }
+  margin-bottom: 1rem; }
 .main-content .highlight pre {
   margin-bottom: 0;
   word-break: normal; }
 .main-content .highlight pre, .main-content pre {
-  padding: 0.8em;
+  padding: 0.8rem;
   overflow: auto;
-  font-size: 0.9em;
+  font-size: 0.9rem;
   line-height: 1.45;
-  border-radius: 0.3em; }
+  border-radius: 0.3rem; }
 .main-content pre code, .main-content pre tt {
   display: inline;
   max-width: initial;
@@ -171,7 +174,7 @@
 .main-content ul, .main-content ol {
   margin-top: 0; }
 .main-content blockquote {
-  padding: 0 1em;
+  padding: 0 1rem;
   margin-left: 0;
   color: #819198;
   border-left: 0.3rem solid #dce6f0; }
@@ -188,18 +191,18 @@
 .main-content table th {
   font-weight: bold; }
 .main-content table th, .main-content table td {
-  padding: 0.5rem 1em;
+  padding: 0.5rem 1rem;
   border: 1px solid #e9ebec; }
 .main-content dl {
   padding: 0; }
 .main-content dl dt {
   padding: 0;
-  margin-top: 1em;
-  font-size: 1em;
+  margin-top: 1rem;
+  font-size: 1rem;
   font-weight: bold; }
 .main-content dl dd {
   padding: 0;
-  margin-bottom: 1em; }
+  margin-bottom: 1rem; }
 .main-content hr {
   height: 2px;
   padding: 0;
@@ -207,22 +210,22 @@
   background-color: #eff0f1;
   border: 0; }
 
-@media screen and (min-width: 64em) {
+@media screen and (min-width: 64rem) {
   .main-content {
-    max-width: 64em;
-    padding: 2rem 6em;
+    max-width: 64rem;
+    padding: 2rem 6rem;
     margin: 0 auto;
-    font-size: 1.1em; } }
+    font-size: 1.1rem; } }
 
-@media screen and (min-width: 42em) and (max-width: 64em) {
+@media screen and (min-width: 42rem) and (max-width: 64rem) {
   .main-content {
-    padding: 2rem 4em;
-    font-size: 1.1em; } }
+    padding: 2rem 4rem;
+    font-size: 1.1rem; } }
 
-@media screen and (max-width: 42em) {
+@media screen and (max-width: 42rem) {
   .main-content {
-    padding: 2rem 1em;
-    font-size: 1em; } }
+    padding: 2rem 1rem;
+    font-size: 1rem; } }
 
 .site-footer {
   position: absolute;

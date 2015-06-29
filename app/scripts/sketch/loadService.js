@@ -1,9 +1,8 @@
 // Copyright (c) 2015 Zhang Yungui (https://github.com/rhcad/geomedit/), GPL licensed.
 
-'use strict';
-
 angular.module('geomeditApp')
   .service('loader', ['$q', '$timeout', function($q, $timeout) {
+    'use strict';
     this.load = function() {
       var deferred = $q.defer();
 
@@ -17,6 +16,7 @@ angular.module('geomeditApp')
 
 angular.module('geomeditApp')
   .directive('newBoard', ['loader', 'boardUI', function(loader, boardUI) {
+    'use strict';
     return {
       link: function(scope, element, attrs) {
         loader.load().then(

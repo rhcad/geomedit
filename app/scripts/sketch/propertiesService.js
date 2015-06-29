@@ -1,16 +1,15 @@
 // Copyright (c) 2015 Zhang Yungui (https://github.com/rhcad/geomedit/), GPL licensed.
 
-'use strict';
-
 angular.module('geomeditApp')
-  .factory('properties', ['board', 'eventHandler', 'commands', 'select',
-    function(bd, eventHandler, commands, select) {
+  .factory('properties', ['model', 'eventHandler', 'commands', 'select',
+    function(model, eventHandler, commands, select) {
+      'use strict';
       var active = false,
           creators = {},
           data = {};
 
       data.options = {
-        faces:     [
+        faces: [
           { id: '', title: 'SelectOption' },
           { id: 'o', title: 'FaceCircle' },
           { id: 'x', title: 'FaceCross' },
@@ -20,15 +19,15 @@ angular.module('geomeditApp')
           { id: '^', title: 'FaceUpTriangle' },
           { id: 'v', title: 'FaceDownTriangle' },
           { id: '<', title: 'FaceLeftTriangle' },
-          { id: '>', title: 'FaceRightTriangle' },
+          { id: '>', title: 'FaceRightTriangle' }
         ],
         positions: [
           { id: '', title: 'SelectOption' },
           { id: 'lft', title: 'PosLeft' },
           { id: 'rt', title: 'PosRight' },
-          { id: 'top', title: 'PosCenter' },
+          { id: 'top', title: 'PosCenter' }
         ],
-        dashes:    [
+        dashes: [
           { id: '', title: 'SelectOption' },
           { id: '0', title: 'SolidLine' },
           { id: '1', title: 'DottedLine' },
@@ -36,9 +35,9 @@ angular.module('geomeditApp')
           { id: '3', title: 'MediumDashes' },
           { id: '4', title: 'BigDashes' },
           { id: '5', title: 'LargeGaps' },
-          { id: '6', title: 'SmallGaps' },
+          { id: '6', title: 'SmallGaps' }
         ],
-        colors:    [
+        colors: [
           'none', '#000000', '#eeeeee', '#808080', '#ff00ff', '#cc0000',
           '#ffa500', '#ffff00', '#3366ff', '#00ffff', '#006400', '#00ff00'
         ]
@@ -55,19 +54,19 @@ angular.module('geomeditApp')
       };
       data.onExit = function() {
         active = false;
-        bd.propObj = null;
+        model.propObj = null;
         data.fetch();
       };
 
       eventHandler.customDownHandlers.push(function() {
         if (active) {
-          bd.propObj = bd.board.downObjects[0];
+          model.propObj = model.board.downObjects[0];
           data.fetch();
         }
       });
 
       eventHandler.customMoveHandlers.push(function() {
-        if (active && bd.propObj) {
+        if (active && model.propObj) {
           data.fetch();
         }
       });
@@ -79,20 +78,20 @@ angular.module('geomeditApp')
       data.fetch = function() {
         var item, items = [], keys = [];
 
-        if (JXG.isString(bd.propObj)) {
-          data.id = bd.propObj;
-          keys = getKeys(bd.propObj);
+        if (JXG.isString(model.propObj)) {
+          data.id = model.propObj;
+          keys = getKeys(model.propObj);
         }
         else {
-          data.id = bd.propObj ? bd.propObj.id : '';
+          data.id = model.propObj ? model.propObj.id : '';
           if (data.validID(data.id)) {
-            keys = getKeys(bd.propObj.elementClass, bd.propObj.type, bd.propObj.elType, bd.propObj);
+            keys = getKeys(model.propObj.elementClass, model.propObj.type, model.propObj.elType, model.propObj);
           }
         }
 
         keys.forEach(function(key) {
           item = creators[key];
-          if (item && item.get && item.get() !== false) {
+          if (!JXG.isFalse(item && item.get && item.get())) {
             item.oldValue = JXG.isObject(item.value) ? JXG.deepCopy({}, item.value) : item.value;
             item.id = key;
             items.push(item);
@@ -102,13 +101,13 @@ angular.module('geomeditApp')
         data.items.length = 0;
         JXG.extend(data.items, items);
         data.updateView();
-        select.select(bd.propObj, true);
+        select.select(model.propObj, true);
       };
 
       data.needSave = function() {
         var n = 0;
 
-        if (bd.propObj) {
+        if (model.propObj) {
           data.items.forEach(function(item) {
             if (JSON.stringify(item.value) !== JSON.stringify(item.oldValue)) {
               n++;
@@ -119,17 +118,17 @@ angular.module('geomeditApp')
       };
 
       data.save = function() {
-        if (bd.propObj) {
+        if (model.propObj) {
           var r, changed = false;
           data.items.forEach(function(item) {
             if (JSON.stringify(item.value) !== JSON.stringify(item.oldValue)) {
               r = item.set();
-              changed = changed || (r !== undefined && r !== false);
+              changed = changed || r;
               item.oldValue = JXG.isObject(item.value) ? JXG.deepCopy({}, item.value) : item.value;
             }
           });
           if (changed) {
-            bd.board.update();
+            model.board.update();
           }
         }
       };
@@ -138,7 +137,7 @@ angular.module('geomeditApp')
         var items = ['label', 'fontSize', 'textColor', 'fixed', 'trace'];
 
         if (elCls === 'board') {
-          items = ['ignoreLabels', 'grid', 'origin', 'units'];
+          items = ['draggable', 'ignoreLabels', 'grid', 'gridCell', 'ticksDistances', 'axis', 'origin', 'units'];
         }
         else if (elType === 'slider') {
           items = ['range', 'snapWidth', 'face', 'size', 'label', 'fontSize', 'textColor',
@@ -155,7 +154,7 @@ angular.module('geomeditApp')
             'fillColor', 'fillOpacity'].concat(items);
         }
         else if (objType === JXG.OBJECT_TYPE_POLYGON) {
-          items = ['dash', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'].concat(items);
+          items = ['innerPoints', 'dash', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'].concat(items);
         }
         else if (objType === JXG.OBJECT_TYPE_ANGLE) {
           items = ['radius', 'label', 'fontSize', 'textColor', 'dash', 'strokeWidth', 'strokeColor',
@@ -166,7 +165,7 @@ angular.module('geomeditApp')
             'strokeOpacity', 'fillColor', 'fillOpacity'];
         }
         else if (objType === JXG.OBJECT_TYPE_GRID) {
-          items = ['dash', 'strokeWidth', 'strokeColor', 'strokeOpacity'];
+          items = ['gridCell', 'gridLT', 'gridRB', 'dash', 'strokeWidth', 'strokeColor', 'strokeOpacity'];
         }
         else if (elCls === JXG.OBJECT_CLASS_CURVE) {
           items = ['functionTerm', 'dash', 'strokeWidth', 'strokeColor', 'strokeOpacity', 'fillColor', 'fillOpacity'].concat(items);
@@ -191,22 +190,22 @@ angular.module('geomeditApp')
 
       creators.snapWidth = {
         type: 'range', min: 1, max: 100,
-        get:  function() {
-          this.value = bd.propObj.getAttribute('snapWidth');
+        get: function() {
+          this.value = model.propObj.getAttribute('snapWidth');
         },
-        set:  function() {
+        set: function() {
           if (isFloat(this.value, this.min, this.max)) {
-            return bd.propObj.setAttribute({ snapWidth: parseInt(this.value) });
+            return model.propObj.setAttribute({ snapWidth: parseInt(this.value) });
           }
         }
       };
 
       creators.strokeWidth = {
         type: 'range', unit: 'px', min: 0.5, max: 50, step: 0.5,
-        get:  function() {
-          this.value = bd.propObj.getAttribute('strokeWidth');
+        get: function() {
+          this.value = model.propObj.getAttribute('strokeWidth');
         },
-        set:  function() {
+        set: function() {
           if (isFloat(this.value, this.min, this.max)) {
             return setPolygonAttribute({ strokeWidth: parseFloat(this.value) });
           }
@@ -214,14 +213,14 @@ angular.module('geomeditApp')
       };
 
       function setPolygonAttribute(attr, vertices) {
-        var r = bd.propObj.setAttribute(attr);
-        if (bd.propObj.borders) {
-          bd.propObj.borders.forEach(function(el) {
+        var r = model.propObj.setAttribute(attr);
+        if (model.propObj.borders) {
+          model.propObj.borders.forEach(function(el) {
             el.setAttribute(attr);
           });
         }
-        if (vertices && bd.propObj.vertices) {
-          bd.propObj.vertices.forEach(function(el) {
+        if (vertices && model.propObj.vertices) {
+          model.propObj.vertices.forEach(function(el) {
             el.setAttribute(attr);
           });
         }
@@ -230,10 +229,10 @@ angular.module('geomeditApp')
 
       creators.dash = {
         type: 'dash',
-        get:  function() {
-          this.value = bd.propObj.getAttribute('dash').toString();
+        get: function() {
+          this.value = model.propObj.getAttribute('dash').toString();
         },
-        set:  function() {
+        set: function() {
           if (this.value) {
             return setPolygonAttribute({ dash: parseInt(this.value) });
           }
@@ -242,33 +241,33 @@ angular.module('geomeditApp')
 
       creators.strokeOpacity = {
         type: 'range', unit: '%', min: 1, max: 100,
-        get:  function() {
-          this.value = Math.round(bd.propObj.getAttribute('strokeOpacity') * 100);
+        get: function() {
+          this.value = Math.round(model.propObj.getAttribute('strokeOpacity') * 100);
         },
-        set:  function() {
+        set: function() {
           return setPolygonAttribute({ strokeOpacity: this.value * 0.01 });
         }
       };
 
       creators.fillOpacity = {
         type: 'range', unit: '%', min: 1, max: 100,
-        get:  function() {
-          this.value = Math.round(bd.propObj.getAttribute('fillOpacity') * 100);
+        get: function() {
+          this.value = Math.round(model.propObj.getAttribute('fillOpacity') * 100);
         },
-        set:  function() {
-          return bd.propObj.setAttribute({ fillOpacity: this.value * 0.01 });
+        set: function() {
+          return model.propObj.setAttribute({ fillOpacity: this.value * 0.01 });
         }
       };
 
       creators.opacity = {
         type: 'range', unit: '%', min: 1, max: 100,
-        get:  function() {
-          this.value = Math.round(bd.propObj.getAttribute('fillOpacity') * 100);
+        get: function() {
+          this.value = Math.round(model.propObj.getAttribute('fillOpacity') * 100);
         },
-        set:  function() {
-          return bd.propObj.setAttribute({
+        set: function() {
+          return model.propObj.setAttribute({
             strokeOpacity: this.value * 0.01,
-            fillOpacity:   this.value * 0.01
+            fillOpacity: this.value * 0.01
           });
         }
       };
@@ -280,100 +279,108 @@ angular.module('geomeditApp')
 
       creators.size = {
         type: 'size', unit: 'px', min: 0.5, max: 50, step: 0.5,
-        get:  function() {
+        get: function() {
           this.value = {
-            size: bd.propObj.getAttribute('size'),
-            zoom: bd.propObj.getAttribute('zoom')
+            size: model.propObj.getAttribute('size'),
+            zoom: model.propObj.getAttribute('zoom')
           };
-          this.value.size = bd.propObj.getAttribute('size');
-          this.value.zoom = bd.propObj.getAttribute('zoom');
+          this.value.size = model.propObj.getAttribute('size');
+          this.value.zoom = model.propObj.getAttribute('zoom');
         },
-        set:  function() {
+        set: function() {
           if (isFloat(this.value.size, this.min, this.max)) {
             var size = parseFloat(this.value.size);
-            return bd.propObj.setAttribute({
-              zoom:        this.value.zoom,
-              size:        size,
+            return model.propObj.setAttribute({
+              zoom: this.value.zoom,
+              size: size,
               strokeWidth: size / 10
             });
           }
         }
       };
 
+      function toFixedNumber(number) {
+        return parseFloat(number.toFixed(4));
+      }
+
       creators.coords = {
         type: 'coords',
-        get:  function() {
+        get: function() {
           this.value = {
-            x:            bd.propObj.coords.usrCoords[1],
-            y:            bd.propObj.coords.usrCoords[2],
-            snapToGrid:   bd.propObj.getAttribute('snapToGrid'),
-            snapToPoints: bd.propObj.getAttribute('snapToPoints')
+            x: toFixedNumber(model.propObj.coords.usrCoords[1]),
+            y: toFixedNumber(model.propObj.coords.usrCoords[2]),
+            snapToGrid: model.propObj.getAttribute('snapToGrid'),
+            snapToPoints: model.propObj.getAttribute('snapToPoints'),
+            readonly: model.propObj.type === JXG.OBJECT_TYPE_CAS
           };
         },
-        set:  function() {
+        set: function() {
           var pattern = /^-?\d+\.?\d*$/,
+              valid = !this.value.readonly && pattern.test(this.value.x) && pattern.test(this.value.y),
               x = parseFloat(this.value.x),
               y = parseFloat(this.value.y),
-              inLimit = function(v) { return Math.abs(v) < 1e3; },
-              attractorDistance = bd.propObj.getAttribute('attractorDistance'),
-              attractorUnit = bd.propObj.getAttribute('attractorUnit');
+              inLimit = function(v) {
+                return Math.abs(v) < 1e3;
+              },
+              attractorDistance = model.propObj.getAttribute('attractorDistance'),
+              attractorUnit = model.propObj.getAttribute('attractorUnit');
 
           if (this.value.snapToPoints && attractorDistance < 1e-5) {
-            attractorDistance = Math.max(bd.board.options.precision.hasPoint, 10);
+            attractorDistance = Math.max(model.board.options.precision.hasPoint, 10);
             attractorUnit = 'screen';
           }
-          if (pattern.test(this.value.x) && pattern.test(this.value.y) && inLimit(x) && inLimit(y)) {
-            bd.propObj.setAttribute({
-              snapToGrid:        this.value.snapToGrid,
-              snapToPoints:      this.value.snapToPoints,
+          if (valid && inLimit(x) && inLimit(y)) {
+            model.propObj.setAttribute({
+              snapToGrid: this.value.snapToGrid,
+              snapToPoints: this.value.snapToPoints,
               attractorDistance: attractorDistance,
-              attractorUnit:     attractorUnit
+              attractorUnit: attractorUnit
             });
-            return bd.propObj.setPositionDirectly(JXG.COORDS_BY_USER, [x, y]);
+            return model.propObj.setPositionDirectly(JXG.COORDS_BY_USER, [x, y]);
           }
         }
       };
 
       creators.lineEndings = {
         type: 'lineEndings',
-        get:  function() {
-          var p = bd.propObj.visProp;
+        get: function() {
+          var p = model.propObj.visProp;
           this.value = {
             restrictFirst: !p.straightfirst,
-            restrictLast:  !p.straightlast,
-            arrowFirst:    p.firstarrow,
-            arrowLast:     p.lastarrow
+            restrictLast: !p.straightlast,
+            arrowFirst: p.firstarrow,
+            arrowLast: p.lastarrow
           };
         },
-        set:  function() {
+        set: function() {
           var v = this.value;
-          return bd.propObj.setAttribute({
+          return model.propObj.setAttribute({
             straightFirst: !v.restrictFirst,
-            straightLast:  !v.restrictLast,
-            firstArrow:    v.arrowFirst,
-            lastArrow:     v.arrowLast
+            straightLast: !v.restrictLast,
+            firstArrow: v.arrowFirst,
+            lastArrow: v.arrowLast
           });
         }
       };
 
       creators.face = {
         type: 'face',
-        get:  function() {
-          this.value = bd.propObj.getAttribute('face');
+        get: function() {
+          this.value = model.propObj.getAttribute('face');
         },
-        set:  function() {
+        set: function() {
           if (this.value) {
-            return bd.propObj.setAttribute({ face: this.value });
+            return model.propObj.setAttribute({ face: this.value });
           }
         }
       };
 
       creators.fixed = {
         type: 'checkbox', icon1: 'lock', icon0: 'unlock',
-        get:  function() {
-          this.value = bd.propObj.getAttribute('fixed');
+        get: function() {
+          this.value = model.propObj.getAttribute('fixed');
         },
-        set:  function() {
+        set: function() {
           return setPolygonAttribute({ fixed: this.value }, true);
         }
       };
@@ -381,13 +388,13 @@ angular.module('geomeditApp')
       function generateNumberProperty(name, attr) {
         return JXG.deepCopy(JXG.deepCopy({type: 'number'}, attr || {}), {
           get: function() {
-            this.value = bd.propObj.getAttribute(name);
+            this.value = model.propObj.getAttribute(name);
           },
           set: function() {
             if (isFloat(this.value, this.min, this.max)) {
               var a = {};
               a[name] = parseFloat(this.value);
-              return bd.propObj.setAttribute(a);
+              return model.propObj.setAttribute(a);
             }
           }
         });
@@ -396,13 +403,13 @@ angular.module('geomeditApp')
       function generateBoolProperty(name, prop) {
         return {
           type: 'checkbox',
-          get:  function() {
-            var obj = prop ? bd.propObj[prop] : bd.propObj;
+          get: function() {
+            var obj = prop ? model.propObj[prop] : model.propObj;
             this.value = obj.getAttribute(name);
           },
-          set:  function() {
+          set: function() {
             var attr = {},
-                obj = prop ? bd.propObj[prop] : bd.propObj;
+                obj = prop ? model.propObj[prop] : model.propObj;
             attr[name] = !!this.value;
             return obj.setAttribute(attr);
           }
@@ -421,10 +428,10 @@ angular.module('geomeditApp')
 
       creators.strokeColor = {
         type: 'color',
-        get:  function() {
-          this.value = color2hex(bd.propObj.getAttribute('strokeColor'));
+        get: function() {
+          this.value = color2hex(model.propObj.getAttribute('strokeColor'));
         },
-        set:  function() {
+        set: function() {
           if (validateColor(this.value)) {
             return setPolygonAttribute({ strokeColor: this.value });
           }
@@ -433,26 +440,26 @@ angular.module('geomeditApp')
 
       creators.fillColor = {
         type: 'color',
-        get:  function() {
-          this.value = color2hex(bd.propObj.getAttribute('fillColor'));
+        get: function() {
+          this.value = color2hex(model.propObj.getAttribute('fillColor'));
         },
-        set:  function() {
+        set: function() {
           if (validateColor(this.value)) {
-            return bd.propObj.setAttribute({ fillColor: this.value });
+            return model.propObj.setAttribute({ fillColor: this.value });
           }
         }
       };
 
       creators.color = {
         type: 'color',
-        get:  function() {
-          this.value = color2hex(bd.propObj.getAttribute('fillColor'));
+        get: function() {
+          this.value = color2hex(model.propObj.getAttribute('fillColor'));
         },
-        set:  function() {
+        set: function() {
           if (validateColor(this.value)) {
-            return bd.propObj.setAttribute({
+            return model.propObj.setAttribute({
               strokeColor: this.value,
-              fillColor:   this.value
+              fillColor: this.value
             });
           }
         }
@@ -460,13 +467,13 @@ angular.module('geomeditApp')
 
       creators.radius = {
         type: 'number', step: 0.1,
-        get:  function() {
-          this.value = bd.propObj.Radius();
-          this.readonly = bd.propObj.method && bd.propObj.method !== 'pointRadius';
+        get: function() {
+          this.value = toFixedNumber(model.propObj.Radius());
+          this.readonly = model.propObj.method && model.propObj.method !== 'pointRadius';
         },
-        set:  function() {
-          if (bd.propObj.method === 'pointRadius') {
-            return bd.propObj.setRadius(this.value);
+        set: function() {
+          if (model.propObj.method === 'pointRadius') {
+            return model.propObj.setRadius(this.value);
           }
         }
       };
@@ -475,25 +482,23 @@ angular.module('geomeditApp')
 
       creators.label = {
         type: 'label',
-        get:  function() {
+        get: function() {
           this.value = {
-            withLabel: !!bd.propObj.getAttribute('withLabel'),
-            name:      bd.propObj.getName()
+            withLabel: !!model.propObj.getAttribute('withLabel'),
+            name: model.propObj.getName()
           };
         },
-        set:  function() {
+        set: function() {
           this.value.name = this.value.name.replace(/(^\s*)|(\s*$)/g, '');
-          var withLabel = !!(this.value.withLabel && this.value.name),
-              newLabel = !bd.propObj.label;
+          var nameChanged = this.value.name && this.value.name !== this.oldValue.name,
+              withLabel = nameChanged || (this.value.withLabel && this.value.name),
+              newLabel = !model.propObj.label;
 
-          if (this.value.name && this.value.name !== this.oldValue.name) {
-            withLabel = true;
+          model.propObj.setAttribute({ withLabel: !!withLabel });
+          if (nameChanged) {
+            model.propObj.setName(this.value.name);
+            model.propObj.label.setAttribute({ visible: true });
             this.value.withLabel = true;
-          }
-          bd.propObj.setAttribute({ withLabel: withLabel });
-          if (this.value.name && this.value.name !== this.oldValue.name) {
-            bd.propObj.setName(this.value.name);
-            bd.propObj.label.setAttribute({ visible: true });
           }
           if (withLabel && newLabel) {
             data.fetch();
@@ -508,148 +513,249 @@ angular.module('geomeditApp')
       };
 
       creators.position = {
-        type:    'position',
-        get:     function() {
+        type: 'position',
+        get: function() {
           var element = this.element();
           this.value = element ? element.getAttribute('position') : '';
         },
-        set:     function() {
+        set: function() {
           var element = this.element();
           return element && element.setAttribute({ position: this.value });
         },
         element: function() {
-          return !bd.propObj ? null : bd.propObj.label || bd.propObj;
+          return !model.propObj ? null : model.propObj.label || model.propObj;
         }
       };
 
       creators.offset = {
         type: 'xy', min: -200, max: 200, unit: 'px',
-        get:  function() {
-          var offset = bd.propObj.getAttribute('offset');
+        get: function() {
+          var offset = model.propObj.getAttribute('offset');
           this.value = { x: offset[0], y: offset[1] };
         },
-        set:  function() {
+        set: function() {
           if (isFloat(this.value.x, this.min, this.max) && isFloat(this.value.y, this.min, this.max)) {
-            return bd.propObj.setAttribute({ offset: [parseInt(this.value.x), parseInt(this.value.y)] });
+            return model.propObj.setAttribute({ offset: [parseInt(this.value.x), parseInt(this.value.y)] });
           }
         }
       };
 
       creators.fontSize = {
-        type:    'number', min: 8, max: 500, step: 0.5,
-        get:     function() {
+        type: 'number', min: 8, max: 500, step: 0.5,
+        get: function() {
           var element = this.element();
           this.value = element ? element.getAttribute('fontSize') : '';
         },
-        set:     function() {
+        set: function() {
           var element = this.element();
           if (element && isFloat(this.value, this.min, this.max)) {
             return element.setAttribute({ fontSize: parseFloat(this.value) }).updateSize();
           }
         },
         element: function() {
-          return !bd.propObj ? null : bd.propObj.label || bd.propObj;
+          return !model.propObj ? null : model.propObj.label || model.propObj;
         }
       };
 
       creators.textColor = {
-        type:    'color',
-        get:     function() {
+        type: 'color',
+        get: function() {
           var element = this.element();
           this.value = element ? element.getAttribute('strokeColor') : '';
         },
-        set:     function() {
+        set: function() {
           var element = this.element();
           if (element && this.value) {
             return element.setAttribute({ strokeColor: this.value });
           }
         },
         element: function() {
-          return !bd.propObj ? null : bd.propObj.label || bd.propObj;
+          return !model.propObj ? null : model.propObj.label || model.propObj;
+        }
+      };
+
+      creators.draggable = {
+        type: 'checkbox',
+        get: function() {
+          this.value = model.draggable;
+        },
+        set: function() {
+          model.draggable = !!this.value;
+          return true;
         }
       };
 
       creators.ignoreLabels = {
         type: 'checkbox',
-        get:  function() {
-          this.value = bd.board.attr.ignorelabels;
+        get: function() {
+          this.value = model.board.attr.ignorelabels;
         },
-        set:  function() {
-          bd.board.attr.ignorelabels = !!this.value;
+        set: function() {
+          model.board.attr.ignorelabels = !!this.value;
           return true;
         }
       };
 
       creators.grid = {
         type: 'checkbox',
-        get:  function() {
-          this.value = bd.board.grids.length > 0 && bd.board.grids[0].getAttribute('visible');
+        get: function() {
+          this.value = model.board.grids.length > 0 && model.board.grids[0].getAttribute('visible');
         },
-        set:  function() {
+        set: function() {
           var attr = { visible: !!this.value };
-          bd.board.grids.forEach(function(el) {
+          model.board.grids.forEach(function(el) {
             el.setAttribute(attr);
           });
           return true;
         }
       };
 
+      creators.axis = {
+        type: 'checkbox',
+        get: function() {
+          var axis = JXG.filterElements(model.board.objectsList, {type: JXG.OBJECT_TYPE_AXIS});
+          this.value = axis[0] && axis[0].getAttribute('visible');
+        },
+        set: function() {
+          var axis = JXG.filterElements(model.board.objectsList, {type: JXG.OBJECT_TYPE_AXIS}),
+              attr = { visible: !!this.value };
+          axis.forEach(function(el) {
+            el.setAttribute(attr);
+          });
+          return true;
+        }
+      };
+
+      creators.gridCell = {
+        type: 'xy', min: 0.5, max: 50, step: 0.5,
+        get: function() {
+          var grid = this.element();
+          if (grid) {
+            this.value = {
+              x: grid.getAttribute('gridX'),
+              y: grid.getAttribute('gridY')
+            };
+          }
+        },
+        set: function() {
+          var grid = this.element();
+          if (grid && isFloat(this.value.x, this.min, this.max) && isFloat(this.value.y, this.min, this.max)) {
+            return grid.setAttribute({ gridX: parseFloat(this.value.x), gridY: parseFloat(this.value.y) });
+          }
+        },
+        element: function() {
+          return model.propObj && model.propObj.type === JXG.OBJECT_TYPE_GRID ? model.propObj :
+            JXG.filterElements(model.board.objectsList, {type: JXG.OBJECT_TYPE_GRID})[0];
+        }
+      };
+
+      creators.gridLT = {
+        type: 'xy', min: -500, max: 500,
+        get: function() {
+          var lt = model.propObj.getAttribute('topLeft');
+          this.value = lt ? { x: lt[0], y: lt[1] } : {};
+        },
+        set: function() {
+          var valid = isFloat(this.value.x, this.min, this.max) && isFloat(this.value.y, this.min, this.max);
+          model.propObj.visProp.topleft = valid ? [parseFloat(this.value.x), parseFloat(this.value.y)] : undefined;
+          model.board.applyZoom();
+          return true;
+        }
+      };
+
+      creators.gridRB = {
+        type: 'xy', min: -500, max: 500,
+        get: function() {
+          var lt = model.propObj.getAttribute('bottomRight');
+          this.value = lt ? { x: lt[0], y: lt[1] } : {};
+        },
+        set: function() {
+          var valid = isFloat(this.value.x, this.min, this.max) && isFloat(this.value.y, this.min, this.max);
+          model.propObj.visProp.bottomright = valid ? [parseFloat(this.value.x), parseFloat(this.value.y)] : undefined;
+          model.board.applyZoom();
+          return true;
+        }
+      };
+
+      creators.ticksDistances = {
+        type: 'xy', min: 1, max: 50, title: 'ticksDistance',
+        get: function() {
+          var ticks = JXG.filterElements(model.board.objectsList, {type: JXG.OBJECT_TYPE_TICKS});
+          if (ticks.length > 1) {
+            this.value = {
+              x: ticks[0].getAttribute('ticksDistance'),
+              y: ticks[1].getAttribute('ticksDistance')
+            };
+          }
+        },
+        set: function() {
+          var ticks = JXG.filterElements(model.board.objectsList, {type: JXG.OBJECT_TYPE_TICKS});
+          if (ticks.length > 1 && isFloat(this.value.x, this.min, this.max) &&
+            isFloat(this.value.y, this.min, this.max)) {
+            ticks[0].setAttribute({ ticksDistance: parseFloat(this.value.x) });
+            ticks[1].setAttribute({ ticksDistance: parseFloat(this.value.y) });
+            return true;
+          }
+        }
+      };
+
       creators.origin = {
         type: 'xy', min: 0, max: 2000, unit: 'px',
-        get:  function() {
+        get: function() {
           this.value = {
-            x: bd.board.origin.scrCoords[1],
-            y: bd.board.origin.scrCoords[2]
+            x: model.board.origin.scrCoords[1],
+            y: model.board.origin.scrCoords[2]
           };
         },
-        set:  function() {
+        set: function() {
           if ((!JXG.exists(this.value.x) || isFloat(this.value.x, this.min, this.max)) &&
             (!JXG.exists(this.value.y) || isFloat(this.value.y, this.min, this.max))) {
-            var x = JXG.exists(this.value.x) ? parseInt(this.value.x) : bd.board.canvasWidth / 2,
-                y = JXG.exists(this.value.y) ? parseInt(this.value.y) : bd.board.canvasHeight / 2;
-            return bd.board.moveOrigin(x, y);
+            var x = JXG.exists(this.value.x) ? parseInt(this.value.x) : model.board.canvasWidth / 2,
+                y = JXG.exists(this.value.y) ? parseInt(this.value.y) : model.board.canvasHeight / 2;
+            return model.board.moveOrigin(x, y);
           }
         }
       };
 
       creators.units = {
         type: 'xy', min: 1, max: 1000, unit: 'px',
-        get:  function() {
+        get: function() {
           this.value = {
-            x: bd.board.unitX,
-            y: bd.board.unitY
+            x: model.board.unitX,
+            y: model.board.unitY
           };
         },
-        set:  function() {
+        set: function() {
           if (isFloat(this.value.x, this.min, this.max) && isFloat(this.value.y, this.min, this.max)) {
-            bd.board.unitX = parseFloat(this.value.x);
-            bd.board.unitY = parseFloat(this.value.y);
-            return bd.board.updateCoords().clearTraces().fullUpdate();
+            model.board.unitX = parseFloat(this.value.x);
+            model.board.unitY = parseFloat(this.value.y);
+            return model.board.updateCoords().clearTraces().fullUpdate();
           }
         }
       };
 
       creators.majorHeight = {
         type: 'checkbox',
-        get:  function() {
-          this.value = bd.propObj.getAttribute('majorHeight') < 0;
+        get: function() {
+          this.value = model.propObj.getAttribute('majorHeight') < 0;
         },
-        set:  function() {
-          var h = Math.abs(bd.propObj.getAttribute('majorHeight'));
-          return bd.propObj.setAttribute({ majorHeight: this.value ? -h : h });
+        set: function() {
+          var h = Math.abs(model.propObj.getAttribute('majorHeight'));
+          return model.propObj.setAttribute({ majorHeight: this.value ? -h : h });
         }
       };
 
       creators.scaleSymbol = {
         type: 'text',
-        get:  function() {
-          this.value = bd.propObj.getAttribute('scaleSymbol');
+        get: function() {
+          this.value = model.propObj.getAttribute('scaleSymbol');
         },
-        set:  function() {
-          return bd.propObj.setAttribute({ scaleSymbol: this.value });
+        set: function() {
+          return model.propObj.setAttribute({ scaleSymbol: this.value });
         }
       };
 
+      creators.innerPoints = generateBoolProperty('hasInnerPoints');
       creators.drawLabels = generateBoolProperty('drawLabels');
       creators.drawZero = generateBoolProperty('drawZero');
       creators.insertTicks = generateBoolProperty('insertTicks');

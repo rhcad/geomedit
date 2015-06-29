@@ -3,9 +3,9 @@
           class="ed-btn"
           ng-class="{disabled: btn.disabled && btn.disabled(), checked: btn.checked && btn.checked() }"
           ng-click="btn.click(this)"
-          data-trigger="hover"
+          data-trigger="{{tooltip.show?'hover':'manual'}}"
           data-placement="bottom"
-          data-title="{{!tooltip.show ? '' : btn.tooltip|translate}}"
+          data-title="{{btn.tooltip|translate}}"
           bs-tooltip>
       <i ng-if="btn.icon" class="fa fa-{{btn.icon}}"></i>{{btn.text}}
     </span>
@@ -16,9 +16,9 @@
           ed-popover="{{btn.popover}}"
           ng-class="{disabled: btn.disabled && btn.disabled(), checked: btn.checked && btn.checked() }"
           ng-click="btn.click(this)"
-          data-trigger="hover"
+          data-trigger="{{tooltip.show?'hover':'manual'}}"
           data-placement="bottom"
-          data-title="{{!tooltip.show ? '' : btn.tooltip|translate}}"
+          data-title="{{btn.tooltip|translate}}"
           bs-tooltip>
       <i ng-if="btn.icon" class="fa fa-{{btn.icon}}"></i>{{btn.text}}
     </span>

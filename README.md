@@ -1,6 +1,6 @@
 # Geometry Editor
 
-An online geometry editor based on AngularJS and JSXGraph.
+An online dynamic geometry editor based on AngularJS and JSXGraph.
 
 [View online demos](http://rhcad.com/#/sketch).
 
@@ -10,11 +10,14 @@ An online geometry editor based on AngularJS and JSXGraph.
 
 ## Features
 
- - [x] Multiple devices (iOS, Android and PC) and browsers.
+ - [x] Suitable for multiple devices and browsers (IE9+ included).
+ - [x] Responsive web design for desktop, tablet and mobile phones.
  - [x] Multiple languages (Chinese and English).
- - [x] Snapping points (vertex, glider, intersection and midpoint).
- - [x] Draw shapes interactively.
- - [x] Show and edit properties of shapes.
+ - [x] Snapping points such as vertex, glider, intersection and midpoint.
+ - [x] Snapping parallel and perpendicular lines.
+ - [x] Draw vector shapes interactively.
+ - [x] Show context tip and widget for interactive tools.
+ - [x] Show and edit properties of various shapes.
  - [ ] Load and save.
  - [ ] Undo and redo.
 

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * @ngdoc overview
  * @name geomeditApp
@@ -11,33 +9,38 @@
 angular.module('geomeditApp', ['ui.router', 'ngAnimate', 'mgcrea.ngStrap', 'pascalprecht.translate', 'LocalStorageModule'])
   .config(['$stateProvider', '$urlRouterProvider', 'localStorageServiceProvider',
     function($stateProvider, $urlRouterProvider, localStorage) {
+      'use strict';
 
       $stateProvider
         .state('home', {
-          url:         '/',
+          url: '/',
           templateUrl: 'views/home.html'
         })
         .state('blog', {
-          url:         '/blog',
+          url: '/blog',
           templateUrl: 'views/home.html'
         })
         .state('sketch', {
-          url:         '/sketch',
+          url: '/sketch',
           templateUrl: 'views/sketch.html',
-          controller:  'MainCtrl'
+          controller: 'MainCtrl'
         })
         .state('sketch.toolbox', {
-          url:         '/tool',
+          url: '/tool',
           templateUrl: 'views/toolbox.html',
-          controller:  'ToolboxCtrl'
+          controller: 'ToolboxCtrl'
         })
         .state('sketch.properties', {
-          url:         '/prop',
+          url: '/prop',
           templateUrl: 'views/properties.html',
-          controller:  'PropCtrl'
+          controller: 'PropCtrl'
         });
 
       $urlRouterProvider.otherwise('/sketch');
       localStorage.setPrefix('geomedit');
+
+      JXG.extend(JXG, { isFalse: function(v) {
+        return typeof v === 'boolean' && !v;
+      }});
 
     }]);

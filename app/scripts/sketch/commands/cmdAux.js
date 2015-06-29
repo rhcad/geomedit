@@ -1,98 +1,172 @@
 // Copyright (c) 2015 Zhang Yungui (https://github.com/rhcad/geomedit/), GPL licensed.
 
-'use strict';
-
 angular.module('geomeditApp')
-  .service('cmdAux', ['board', 'motion', function(bd, motion) {
+  .service('cmdAux', ['model', 'motion', function(model, motion) {
+    'use strict';
 
-    this.addPointCommand = function(group, id, snapMasks) {
+    function checkParams(p) {
+      if (JXG.isFunction(p.snapFilter)) {
+        p.snapMasks = p.snapMasks || {};
+        p.snapMasks.filter = p.snapFilter;
+      }
+      p.afterCreated = p.afterCreated || function(el) {
+        return el;
+      };
+    }
+
+    function showTip(p, step) {
+      if (p.tip) {
+        if (JXG.isString(p.tip)) {
+          model.context.tip = p.tip;
+        }
+        else if (JXG.isFunction(p.tip)) {
+          model.context.tip = p.tip(step);
+          model.context.applyContext();
+        }
+      }
+    }
+
+    this.generateTip = function(tips) {
+      return function(step) {
+        return tips[Math.min(step, tips.length - 1)];
+      }
+    };
+
+    this.addPointCommand = function(p) {
+      checkParams(p);
+
       function downHandler() {
-        motion.setDraftCoords(0, snapMasks);
+        motion.setDraftCoords(0, p.snapMasks);
         motion.createDraftPoint(0);
       }
 
       function upHandler() {
         motion.submit(function() {
           var created = motion.getDraftCoords().created;
-          return (!snapMasks || JXG.isPoint(created)) && motion.createPoint(0);
+          if (!p.snapMasks || JXG.isPoint(created)) {
+            return motion.createPoint(0);
+          }
+          return JXG.isFunction(p.defaultCreator) && p.defaultCreator();
         });
       }
 
-      bd.addCommand(group || 'point', {
-        id:          id,
-        downHandler: downHandler,
-        upHandler:   upHandler
+      model.addCommand(p.group || 'point', p.id, makeHandlers(p, downHandler, upHandler));
+    };
+
+    this.snapMasksForLine = { gliderFilter: function(el) {
+      return el.elementClass === JXG.OBJECT_CLASS_LINE;
+    }};
+    this.snapMasksForTriangle = { gliderFilter: function(el) {
+      return el.type === JXG.OBJECT_TYPE_POLYGON && el.borders.length === 3;
+    }};
+    this.snapMasksForCircle = { gliderFilter: function(el) {
+      return el.type === JXG.OBJECT_TYPE_CIRCLE;
+    }};
+
+    this.perpendicularFilter = function(v) {
+      var tmp;
+      v.hits.forEach(function(el) {
+        if (JXG.isPoint(model.drafts[0]) && el.elementClass === JXG.OBJECT_CLASS_LINE) {
+          tmp = model.create('perpendicularPoint', [model.drafts[0], el], model.initOptions.perpendicularPoint);
+
+          v.dist = tmp.coords.distance(JXG.COORDS_BY_SCREEN, v.coords);
+          if (v.minDist > v.dist) {
+            v.minDist = v.dist;
+            v.snapped = el;
+            if (v.created) {
+              model.board.removeObject(v.created);
+            }
+            v.created = tmp;
+          }
+          else {
+            model.board.removeObject(tmp);
+          }
+        }
       });
     };
 
-    this.addCommandSnapSecond = function(group, id, filter) {
+    this.addCommandSnapSecond = function(p) {
+      checkParams(p);
+
       function downHandler() {
         if (!motion.hasDraftCoords()) {
           motion.addDraftCoords();
-          motion.addDraftCoords({ filter: filter });
-          bd.drafts.push(bd.create('segment', motion.createDraftPoints(0, 1)));
+          motion.addDraftCoords(p.snapMasks);
+          var el = model.create('segment', motion.createDraftPoints(0, 1), { strokeWidth: 1, dash: 2 });
+          model.drafts.push(p.afterCreated(el));
         }
         else {
           motion.updateDraftCoords();
         }
+        p.cmd.step = 2;
       }
 
       function upHandler() {
         if (motion.lastDraftCoordsIsNew()) {
+          p.cmd.step = 0;
           motion.submit(function() {
-            var created = motion.getDraftCoords().created;
-            if (JXG.isPoint(created)) {
-              var parents = [motion.createPoint(0, true), motion.getDraftCoords().snapped];
-              if (created.elType === 'mirrorpoint') {
+            var endSnap = motion.getDraftCoords();
+            if (endSnap.snapped) {
+              if (JXG.isFunction(p.creator)) {
+                return p.creator(motion.createPoint(0, true), endSnap);
+              }
+              var parents = [motion.createPoint(0, true), endSnap.snapped];
+              if (endSnap.created.elType === 'mirrorpoint') {
                 parents.reverse();
               }
-              return bd.create(created.elType, parents);
+              return p.afterCreated(model.create(endSnap.created.elType, parents, p.attr));
             }
           });
         }
+        else {
+          p.cmd.step = 1;
+        }
       }
 
-      bd.addCommand(group || 'point', {
-        id:          id,
-        downHandler: downHandler,
-        upHandler:   upHandler
-      });
+      model.addCommand(p.group || 'point', p.id, makeHandlers(p, downHandler, upHandler));
     };
 
-    this.addLineCommand = function(group, id, type, attr) {
+    this.addLineCommand = function(p) {
+      checkParams(p);
 
       function downHandler() {
         if (!motion.hasDraftCoords()) {
           motion.addDraftCoords();
           motion.addDraftCoords();
-          bd.drafts.push(bd.create(type, motion.createDraftPoints(0, 1), attr));
+          var el = model.create(p.type, motion.createDraftPoints(0, 1), p.attr);
+          model.drafts.push(p.afterCreated(el));
         }
         else {
           motion.updateDraftCoords();
         }
+        p.cmd.step = 2;
       }
 
       function upHandler() {
         if (motion.lastDraftCoordsIsNew()) {
+          p.cmd.step = 0;
           motion.submit(function() {
-            return bd.create(type, motion.createPoints(), attr);
+            var p1 = motion.createPoint(0, true, p.attrP1),
+                p2 = motion.createPoint(1, true, p.attrP2);
+            return p.afterCreated(model.create(p.type, [p1, p2], p.attr));
           });
+        }
+        else {
+          p.cmd.step = 1;
         }
       }
 
-      bd.addCommand(group || 'line', {
-        id:          id,
-        downHandler: downHandler,
-        upHandler:   upHandler
-      });
+      model.addCommand(p.group || 'line', p.id, makeHandlers(p, downHandler, upHandler));
     };
 
-    this.addCommandSnapFirst = function(group, id, snapMasks, creator) {
+    this.addCommandSnapFirst = function(p) {
+      checkParams(p);
+
       function downHandler() {
         if (!motion.hasDraftCoords()) {
-          if (motion.addDraftCoords(snapMasks).snapped) {
+          if (motion.addDraftCoords(p.snapMasks).snapped) {
             motion.addDraftCoords();
-            bd.drafts.push(creator(motion.getDraftCoords(0), motion.createDraftPoint(1)));
+            model.drafts.push(p.creator(motion.getDraftCoords(0), motion.createDraftPoint(1)));
           }
           else {
             motion.clearDraftCoords();
@@ -101,88 +175,140 @@ angular.module('geomeditApp')
         else {
           motion.updateDraftCoords();
         }
+        p.cmd.step = 2;
       }
 
       function upHandler() {
         if (motion.lastDraftCoordsIsNew()) {
+          p.cmd.step = 0;
           motion.submit(function() {
-            return creator(motion.getDraftCoords(0), motion.createPoint(1, true));
+            return p.creator(motion.getDraftCoords(0), motion.createPoint(1, true, p.attr));
           });
+        }
+        else {
+          p.cmd.step = 1;
         }
       }
 
-      bd.addCommand(group || 'line', {
-        id:          id,
-        downHandler: downHandler,
-        upHandler:   upHandler
-      });
+      model.addCommand(p.group || 'line', p.id, makeHandlers(p, downHandler, upHandler));
     };
 
-    this.addCommand3p = function(group, id, type) {
+    this.addCommand3p = function(p) {
       var points;
 
+      checkParams(p);
+
       function downHandler() {
-        if (!motion.hasDraftCoords()) {
+        var count = motion.draftCoordsCount();
+        if (count < 1) {
           motion.addDraftCoords();
           motion.addDraftCoords();
           points = motion.createDraftPoints(0, 1, 2);
+          p.cmd.step = 1;
         }
-        else if (motion.lastDraftCoordsIsNew()) {
+        else if (count < 3 && motion.lastDraftCoordsIsNew()) {
           motion.addDraftCoords();
-          bd.drafts.push(bd.create(type, points));
+          model.drafts.push(p.afterCreated(model.create(p.type, points), points));
         }
         else {
           motion.updateDraftCoords();
         }
+        p.cmd.step++;
       }
 
       function upHandler() {
-        if (motion.draftCoordsCount() === 3 && motion.lastDraftCoordsIsNew()) {
-          motion.submit(function() {
-            return bd.create(type, motion.createPoints());
-          });
-        }
-      }
-
-      bd.addCommand(group || 'circle', {
-        id:          id,
-        downHandler: downHandler,
-        upHandler:   upHandler
-      });
-    };
-
-    this.addPolygonCommand = function(group, id, maxcount, indexes) {
-
-      function downHandler() {
-        if (!motion.hasDraftCoords()) {
-          motion.addDraftCoords();
-          motion.addDraftCoords();
-          bd.drafts.push(bd.create('polygon', motion.createDraftPoints(indexes)));
-        }
-        else if (motion.lastDraftCoordsIsNew()) {
-          motion.addDraftCoords();
-          if (motion.lastDraftCoordsIsNew() && motion.draftCoordsCount() < maxcount) {
-            motion.addDraftCoords();
+        if (motion.lastDraftCoordsIsNew()) {
+          p.cmd.step++;
+          if (motion.draftCoordsCount() === 3) {
+            p.cmd.step = 0;
+            motion.submit(function() {
+              points = motion.createPoints();
+              return p.afterCreated(model.create(p.type, points), points);
+            });
           }
         }
         else {
+          p.cmd.step--;
+        }
+      }
+
+      model.addCommand(p.group || 'circle', p.id, makeHandlers(p, downHandler, upHandler));
+    };
+
+    this.addPolygonCommand = function(p) {
+      checkParams(p);
+
+      function downHandler() {
+        var count = motion.draftCoordsCount();
+        if (count < 1) {
+          motion.addDraftCoords();
+          motion.addDraftCoords();
+          p.cmd.step = 1;
+
+          var i, indexes = [];
+          for (i = 0; i < p.maxCount; i++) {
+            indexes[i] = i;
+          }
+          model.drafts.push(model.create('polygon', motion.createDraftPoints(indexes)));
+        }
+        else if (motion.lastDraftCoordsIsNew() && count < p.maxCount) {
+          motion.addDraftCoords();
+        }
+        else {
           motion.updateDraftCoords();
         }
+        p.cmd.step++;
       }
 
       function upHandler() {
-        if (motion.draftCoordsCount() === maxcount && motion.lastDraftCoordsIsNew()) {
-          motion.submit(function() {
-            return bd.create('polygon', motion.createPoints());
-          });
+        if (motion.lastDraftCoordsIsNew()) {
+          p.cmd.step++;
+          if (motion.draftCoordsCount() === p.maxCount) {
+            p.cmd.step = 0;
+            motion.submit(function() {
+              return model.create('polygon', motion.createPoints());
+            });
+          }
+        }
+        else {
+          p.cmd.step--;
         }
       }
 
-      bd.addCommand(group || 'polygon', {
-        id:          id,
-        downHandler: downHandler,
-        upHandler:   upHandler
-      });
+      model.addCommand(p.group || 'polygon', p.id, makeHandlers(p, downHandler, upHandler));
     };
+
+    function makeHandlers(p, downHandler, upHandler) {
+      var cmd = { step: 0 };
+
+      p.tip = p.tip || 'Tip_' + p.id;
+      p.cmd = cmd;
+
+      cmd.downHandler = !JXG.isFunction(p.tip) ? downHandler : function() {
+        downHandler();
+        showTip(p, cmd.step);
+      };
+      cmd.upHandler = !JXG.isFunction(p.tip) ? upHandler : function() {
+        upHandler();
+        showTip(p, cmd.step);
+      };
+
+      cmd.inited = function() {
+        cmd.step = 0;
+        if (JXG.isFunction(p.inited) && JXG.isFalse(p.inited())) {
+          return false;
+        }
+        showTip(p, cmd.step);
+      };
+
+      if (JXG.isFunction(p.cancelled)) {
+        cmd.cancelled = p.cancelled;
+      }
+      if (JXG.isFunction(p.clickHandler)) {
+        cmd.clickHandler = p.clickHandler;
+      }
+
+      return cmd;
+    }
 
   }]);

@@ -3,19 +3,19 @@
         class="ed-btn ed-nav-btn"
         ng-click="sidebar.go(v.state)"
         ng-class="{active: sidebar.state === v.state}"
-        data-trigger="hover"
+        data-trigger="{{tooltip.show?'hover':'manual'}}"
         data-placement="bottom"
-        data-title="{{!tooltip.show ? '' : (v.state|camelCase|translate)}}"
+        data-title="{{(v.state|camelCase|translate)}}"
         bs-tooltip>
     <i class="fa fa-{{v.icon}}"></i>
   </span>
   <span class="ed-btn" id="hide-sidebar"
         ng-click="sidebar.toggleVisible()"
-        data-trigger="hover"
+        data-trigger="{{tooltip.show?'hover':'manual'}}"
         data-placement="bottom"
-        data-title="{{!tooltip.show ? '' : 'HideSidebar'|translate}}"
+        data-title="{{'HideSidebar'|translate}}"
         bs-tooltip>
-    <i class="fa fa-angle-left"></i>
+    <i class="fa"></i>
   </span>
 </div>
 <div id="sidebar-list" ui-view></div>

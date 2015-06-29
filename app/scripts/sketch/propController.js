@@ -1,10 +1,10 @@
 // Copyright (c) 2015 Zhang Yungui (https://github.com/rhcad/geomedit/), GPL licensed.
 
-'use strict';
-
 angular.module('geomeditApp')
-  .controller('PropCtrl', ['$scope', 'properties', 'board', 'select',
-    function($scope, properties, bd, select) {
+  .controller('PropCtrl', ['$scope', 'properties', 'model', 'select',
+    function($scope, properties, model, select) {
+      'use strict';
+
       $scope.options = properties.options;
       $scope.items = properties.items;
       $scope.sidebar.go('properties', true);
@@ -16,7 +16,7 @@ angular.module('geomeditApp')
       $scope.info = function(obj) {
         var ret = {};
 
-        obj = JXG.def(obj, bd.propObj);
+        obj = JXG.def(obj, model.propObj);
         if (obj && obj.getAttribute) {
           ret.id = obj.id;
           ret.type = obj.type;
@@ -32,30 +32,30 @@ angular.module('geomeditApp')
       };
 
       $scope.objects = function() {
-        var ret = (bd.board ? bd.board.objectsList : []).filter(function(obj) {
+        var ret = (model.board ? model.board.objectsList : []).filter(function(obj) {
           return properties.validID($scope.trimID(obj.id));
         });
         return ret.reverse();
       };
 
       $scope.clearSelection = function() {
-        bd.propObj = null;
+        model.propObj = null;
         properties.fetch();
       };
 
       $scope.selectObject = function(obj) {
-        bd.propObj = obj;
+        model.propObj = obj;
         properties.fetch();
       };
 
       $scope.switchVisible = function(obj) {
-        obj = obj ? obj : bd.propObj;
+        obj = obj ? obj : model.propObj;
         obj.setAttribute({ visible: !obj.getAttribute('visible') });
       };
 
       $scope.removeObject = function(obj) {
         select.resetSelection();
-        bd.board.removeObject(obj);
+        model.board.removeObject(obj);
       };
 
       $scope.highlight = function() {
@@ -74,6 +74,7 @@ angular.module('geomeditApp')
   ]);
 
 angular.module('geomeditApp').filter('concatUnit', function() {
+  'use strict';
   return function(text, unit, maxLen) {
     maxLen = maxLen ? maxLen : 14;
     return text + (unit && text.length < maxLen ? '(' + unit + ')' : '');
@@ -92,9 +93,10 @@ angular.module('geomeditApp').filter('concatUnit', function() {
  * @return string
  */
 angular.module('geomeditApp').filter('truncate', function() {
+  'use strict';
   return function(text, length, end) {
     if (!text) {
-      return text;
+      return '';
     }
 
     length = length ? length : 10;
@@ -110,7 +112,11 @@ angular.module('geomeditApp').filter('truncate', function() {
 });
 
 angular.module('geomeditApp').filter('camelCase', function() {
+  'use strict';
   return function(text, littleCamelCase) {
+    if (!text) {
+      return '';
+    }
     text = littleCamelCase ? text : '_' + text;
     return text.replace(/_(.)/g, function(match, letter) {
       return letter.toUpperCase();

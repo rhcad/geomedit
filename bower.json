@@ -14,8 +14,7 @@
     "angular-local-storage": "~0.2.2",
     "jsxgraph": "~0.99.3"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "resolutions": {
     "angular": "~1.4.0"
   },

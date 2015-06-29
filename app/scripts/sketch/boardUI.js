@@ -1,58 +1,68 @@
 // Copyright (c) 2015 Zhang Yungui (https://github.com/rhcad/geomedit/), GPL licensed.
 
-'use strict';
-
 angular.module('geomeditApp')
-  .service('boardUI', ['board', 'eventHandler', 'select', function(bd, eventHandler, select) {
+  .service('boardUI', ['model', 'eventHandler', 'select', function(model, eventHandler, select) {
+    'use strict';
 
     this.initBoard = function(id) {
-      JXG.Options.axis = JXG.deepCopy(JXG.Options.axis, bd.initOptions.axis);
-      bd.board = JXG.JSXGraph.initBoard(id, bd.initAttr);
-      bd.board.moveOrigin(bd.board.canvasWidth / 2, bd.board.canvasHeight / 2);
-      bd.board.options = JXG.deepCopy(bd.board.options, bd.initOptions);
+      JXG.Options.axis = JXG.deepCopy(JXG.Options.axis, model.initOptions.axis);
+      model.board = JXG.JSXGraph.initBoard(id, model.initAttr);
+      model.board.moveOrigin(model.board.canvasWidth / 2, model.board.canvasHeight / 2);
+      model.board.options = JXG.deepCopy(model.board.options, model.initOptions);
       eventHandler.registerHandlers();
     };
 
     this.freeBoard = function() {
       var id;
-      if (bd.board) {
-        id = bd.board.containerObj.id;
+      if (model.board) {
+        id = model.board.containerObj.id;
         eventHandler.unregisterHandlers();
 
-        bd.propObj = null;
+        model.propObj = null;
         select.resetSelection();
 
-        JXG.JSXGraph.freeBoard(bd.board);
-        bd.board = null;
+        JXG.JSXGraph.freeBoard(model.board);
+        model.board = null;
       }
       return id;
     };
 
     this.resizeBoard = function(w, h) {
-      if (bd.board) {
-        if (!equals(bd.board.canvasWidth, w) || !equals(bd.board.canvasHeight, h)) {
-          var xcSame = equals(bd.board.origin.scrCoords[1], bd.board.canvasWidth / 2),
-              ycSame = equals(bd.board.origin.scrCoords[2], bd.board.canvasHeight / 2);
+      if (model.board && (!equals(model.board.canvasWidth, w) || !equals(model.board.canvasHeight, h))) {
+        var xcSame = equals(model.board.origin.scrCoords[1], model.board.canvasWidth / 2),
+            ycSame = equals(model.board.origin.scrCoords[2], model.board.canvasHeight / 2);
 
-          bd.board.resizeContainer(w, h, false, true);
-          bd.board.applyZoom();
-          if (xcSame || ycSame) {
-            bd.board.moveOrigin(xcSame ? bd.board.canvasWidth / 2 : bd.board.origin.scrCoords[1],
-              ycSame ? bd.board.canvasHeight / 2 : bd.board.origin.scrCoords[2]);
-          }
+        model.board.resizeContainer(w, h, false, true);
+        model.board.applyZoom();
+        if (xcSame || ycSame) {
+          model.board.moveOrigin(xcSame ? model.board.canvasWidth / 2 : model.board.origin.scrCoords[1],
+            ycSame ? model.board.canvasHeight / 2 : model.board.origin.scrCoords[2]);
         }
       }
     };
 
     this.zooms = {
       zoomDefault: function() {
-        return bd.board.zoom100();
+        model.board.moveOrigin(model.board.canvasWidth / 2, model.board.canvasHeight / 2);
+        return model.board.zoom100();
       },
-      zoomIn:      function() {
-        return bd.board.zoomIn();
+      zoomIn: function() {
+        return model.board.zoomIn();
       },
-      zoomOut:     function() {
-        return bd.board.zoomOut();
+      zoomOut: function() {
+        return model.board.zoomOut();
+      },
+      clickLeftArrow: function() {
+        return model.board.clickLeftArrow();
+      },
+      clickRightArrow: function() {
+        return model.board.clickRightArrow();
+      },
+      clickUpArrow: function() {
+        return model.board.clickUpArrow();
+      },
+      clickDownArrow: function() {
+        return model.board.clickDownArrow();
       }
     };
 

@@ -1,9 +1,9 @@
 // Copyright (c) 2015 Zhang Yungui (https://github.com/rhcad/geomedit/), GPL licensed.
 
-'use strict';
-
 angular.module('geomeditApp')
-  .service('motion', ['board', 'snap', function(bd, snap) {
+  .service('motion', ['model', 'snap', function(model, snap) {
+    'use strict';
+
     this.startPt = null;
     this.lastPt = null;
     this.pt = null;
@@ -23,150 +23,196 @@ angular.module('geomeditApp')
     };
 
     this.clearDraftCoords = function() {
-      while (bd.snaps.length > 0) {
-        bd.snaps.pop().clear();
+      while (model.snaps.length > 0) {
+        model.snaps.pop().clear();
       }
       this.startPt = this.lastPt = this.pt = null;
     };
 
     this.clearDrafts = function() {
-      while (bd.drafts.length > 0) {
-        bd.board.removeObject(bd.drafts.pop());
+      while (model.drafts.length > 0) {
+        model.board.removeObject(model.drafts.pop());
       }
     };
 
     this.getDraftCoords = function(index) {
       index = JXG.def(index, -1);
-      index = index < 0 ? bd.snaps.length + index : index;
-      return bd.snaps[index];
+      index = index < 0 ? model.snaps.length + index : index;
+      return model.snaps[index];
     };
 
     this.setDraftCoords = function(index, snapMasks) {
-      index = index < 0 ? bd.snaps.length + index : index;
-      bd.snaps[index] = snap.snapCoords(this.pt, bd.snaps[index], snapMasks);
+      index = index < 0 ? model.snaps.length + index : index;
+      model.snaps[index] = snap.snapCoords(this.pt, model.snaps[index], snapMasks);
     };
 
     this.updateDraftCoords = function() {
-      var index = bd.snaps.length - 1;
-      bd.snaps[index] = snap.snapCoords(this.pt, bd.snaps[index]);
+      var index = model.snaps.length - 1;
+      model.snaps[index] = snap.snapCoords(this.pt, model.snaps[index]);
     };
 
     this.addDraftCoords = function(snapMasks) {
       var r = snap.snapCoords(this.pt, null, snapMasks);
-      bd.snaps.push(r);
+      model.snaps.push(r);
       return r;
     };
 
     this.draftCoordsCount = function() {
-      return bd.snaps.length;
+      return model.snaps.length;
     };
 
     this.hasDraftCoords = function() {
-      return bd.snaps.length > 0;
+      return model.snaps.length > 0;
     };
 
     this.lastDraftCoordsIsNew = function() {
       var dist = 0;
-      if (bd.snaps.length > 1) {
+      if (model.snaps.length > 1) {
         dist = this.getDraftCoords(-1).coords.distance(JXG.COORDS_BY_SCREEN, this.getDraftCoords(-2).coords);
       }
       return dist > 5;
     };
 
     this.createDraftPoint = function(index) {
-      var get = function(order) {
-            var i = Math.min(index, bd.snaps.length - 1),
-                item = i < 0 ? null : bd.snaps[i];
-            return item ? (item.created ? item.created.coords : item.coords).usrCoords[order] : 0;
+      var getCoords = function(el) {
+            return el ? (el.point2 ? el.point2.coords : el.coords) : null;
           },
-          xfn = function() { return get(1); },
-          yfn = function() { return get(2); };
-      var point = bd.create('point', [xfn, yfn], { withLabel: false }),
+          get = function(order) {
+            var i = Math.min(index, model.snaps.length - 1),
+                item = i < 0 ? null : model.snaps[i];
+            return item ? (getCoords(item.created) || item.coords).usrCoords[order] : 0;
+          },
+          xfn = function() {
+            return get(1);
+          },
+          yfn = function() {
+            return get(2);
+          };
+      var point = model.create('point', [xfn, yfn], { withLabel: false }),
           initial = JXG.deepCopy({}, point.visProp),
-          snapSize = Math.max(bd.board.options.precision.hasPoint, initial.size + 4);
+          snapSize = Math.max(model.board.options.precision.hasPoint, initial.size + 6);
 
       function update() {
-        var i = Math.min(index, bd.snaps.length - 1),
-            snapped = i >= 0 && bd.snaps[i].snapped,
-            created = snapped ? bd.snaps[i].created : null;
+        var i = Math.min(index, model.snaps.length - 1),
+            snapped = i >= 0 && model.snaps[i].snapped,
+            created = snapped ? model.snaps[i].created : null,
+            opacity = created && model.snaps[i].glider ? 0.1 : snapped ? 0.4 : 1.0,
+            color = created ? created.visProp.strokecolor : initial.strokecolor;
+
         point.setAttribute({
-          size:        snapped ? snapSize : initial.size,
-          fillopacity: created && bd.snaps[i].glider ? 0.1 : snapped ? 0.3 : 1.0,
-          strokecolor: created ? created.visProp.strokecolor : initial.strokecolor
+          size: snapped ? snapSize : initial.size,
+          fillOpacity: opacity,
+          strokeColor: color
         });
       }
 
       point.coords.on('update', update, point);
       update();
 
-      bd.drafts.push(point);
+      model.drafts.push(point);
       return point;
     };
 
     this.createDraftPoints = function(indexes) {
       var self = this;
       indexes = JXG.isArray(indexes) ? indexes : Array.prototype.slice.call(arguments);
-      return indexes.map(function(i) { return self.createDraftPoint(i); });
+      return indexes.map(function(i) {
+        return self.createDraftPoint(i);
+      });
     };
 
     this.createPoint = function(index, allowSnapped, attr) {
-      var it = JXG.isObject(index) ? index : bd.snaps[index];
-      if (allowSnapped && it.snapped && !it.created) {
+      var it = JXG.isObject(index) ? index : model.snaps[index < 0 ? model.snaps.length + index : index];
+      if (allowSnapped && JXG.isPoint(it.snapped) && !it.created) {
         return it.snapped;
       }
-      var point = it.detach() || !it.snapped && bd.create('point', it.coords.usrCoords.slice(1), attr);
-      if (point && bd.pendings) {
-        bd.pendings.push(point);
+      return createPendingsPoint(it, attr);
+    };
+
+    function createPendingsPoint(it, attr) {
+      var point = it.detach() || !it.snapped && model.create('point', it.coords.usrCoords.slice(1), attr);
+      if (point && model.pendings) {
+        model.pendings.push(point);
+      }
+      return point;
+    }
+
+    this.createGlider = function(el, coords) {
+      var point = model.create('glider', (coords || this.pt).usrCoords.slice(1).concat(el));
+      if (point && model.pendings) {
+        model.pendings.push(point);
       }
       return point;
     };
 
     this.createPoints = function(attr) {
       var self = this,
-          ret = bd.snaps.map(function(item) {
+          ret = model.snaps.map(function(item) {
             return self.createPoint(item, true, attr);
           });
-      bd.snaps.length = 0;
+      model.snaps.length = 0;
       return ret;
     };
 
     this.submit = function(creation) {
-      var self = this, sp;
+      var self = this, sp,
+          hasPendings = function(el) {
+            return model.pendings.indexOf(el) < 0;
+          },
+          addPending = function(sp) {
+            if (JXG.isArray(sp)) {
+              sp.forEach(function(el) {
+                if (hasPendings(el)) {
+                  model.pendings.push(el);
+                }
+                model.propObj = el;
+              });
+            }
+            else {
+              if (hasPendings(sp)) {
+                model.pendings.push(sp);
+              }
+              model.propObj = sp;
+            }
+          };
+
       try {
         self.clearDrafts();
-        bd.pendings = [];
+        model.pendings = [];
         sp = creation();
         if (sp) {
-          if (bd.pendings.indexOf(sp) < 0) {
-            bd.pendings.push(sp);
-          }
-          bd.propObj = sp;
+          addPending(sp);
         }
       } catch (e) {
-        while (bd.pendings.length > 0) {
-          bd.board.removeObject(bd.pendings.pop());
+        while (model.pendings.length > 0) {
+          model.board.removeObject(model.pendings.pop());
         }
         throw e;
       } finally {
-        bd.pendings = null;
+        model.pendings = null;
         self.clearDraftCoords();
       }
     };
 
+    this.isSegment = snap.isSegment;
+    this.hitTest = function(masks) {
+      return snap.hitTest(this.pt, masks);
+    };
+
     this.getMouseCoords = function(e) {
       var absPos = JXG.getPosition(e),
-          lt = bd.board.getCoordsTopLeftCorner(),
+          lt = model.board.getCoordsTopLeftCorner(),
           dx = absPos[0] - lt[0],
           dy = absPos[1] - lt[1];
-      return new JXG.Coords(JXG.COORDS_BY_SCREEN, [dx, dy], bd.board);
+      return new JXG.Coords(JXG.COORDS_BY_SCREEN, [dx, dy], model.board);
     };
 
     this.getTouchCoords = function(e, index) {
       var absPos = JXG.getPosition(e, index),
-          lt = bd.board.getCoordsTopLeftCorner(),
+          lt = model.board.getCoordsTopLeftCorner(),
           dx = absPos[0] - lt[0],
           dy = absPos[1] - lt[1];
-      return new JXG.Coords(JXG.COORDS_BY_SCREEN, [dx, dy], bd.board);
+      return new JXG.Coords(JXG.COORDS_BY_SCREEN, [dx, dy], model.board);
     };
 
     this.getEventCoords = function(e) {

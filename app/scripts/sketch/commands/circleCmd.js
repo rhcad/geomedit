@@ -1,38 +1,44 @@
 // Copyright (c) 2015 Zhang Yungui (https://github.com/rhcad/geomedit/), GPL licensed.
 
-'use strict';
-
 angular.module('geomeditApp')
-  .run(['board', 'motion', 'cmdAux', function(bd, motion, cmdAux) {
+  .run(['model', 'motion', 'cmdAux', function(model, motion, cmdAux) {
+    'use strict';
 
-    cmdAux.addCommand3p('', 'circle3p', 'circumCircle');
-    cmdAux.addCommand3p('', 'in_circle', 'incircle');
+    var tip3p = cmdAux.generateTip(['TipClkDragFromPt', 'TipClkDragToP2', 'TipDragToP2', 'TipClkDragToEnd', 'TipDragToEnd']),
+        c2tip = cmdAux.generateTip(['TipCircle2p', 'TipClkDragToRadius', 'TipDragToRadius']);
 
-    (function() {
-      function downHandler() {
-        if (!motion.hasDraftCoords()) {
-          motion.addDraftCoords();
-          motion.addDraftCoords();
-          bd.drafts.push(bd.create('circle', motion.createDraftPoints(0, 1)));
-        }
-        else {
-          motion.updateDraftCoords();
-        }
-      }
-
-      function upHandler() {
-        if (motion.lastDraftCoordsIsNew()) {
+    cmdAux.addCommand3p({ id: 'circle3p', type: 'circumCircle', tip: tip3p,
+      clickHandler: function() {
+        var triangle = motion.hitTest(cmdAux.snapMasksForTriangle);
+        if (triangle && triangle.vertices) {
           motion.submit(function() {
-            return bd.create('circle', motion.createPoints());
+            return model.create('circumCircle', triangle.vertices);
           });
         }
       }
-
-      bd.addCommand('circle', {
-        id:          'circle2p',
-        downHandler: downHandler,
-        upHandler:   upHandler
-      });
-    }());
+    });
+    cmdAux.addCommand3p({ id: 'in_circle', type: 'inCircle', tip: tip3p });
+    cmdAux.addLineCommand({ group: 'circle', id: 'circle2p', type: 'circle',
+      attrP2: { visible: false },
+      tip: function(step) {
+        model.context.input = model.context.input || {
+          title: 'radius',
+          hide: function() {
+            return model.context.step > 1;
+          }};
+        model.context.step = step;
+        return c2tip(step);
+      },
+      clickHandler: function() {
+        var input = model.context.input,
+            radius = input && !input.hide() && input.value;
+        if (radius) {
+          motion.submit(function() {
+            var center = motion.createPoint(0, true);
+            return model.create('circle', [center, radius]);
+          });
+        }
+      }
+    });
 
   }]);

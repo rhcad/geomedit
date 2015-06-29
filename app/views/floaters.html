@@ -1,39 +1,102 @@
 <div id="show-sidebar" class="show-bar" ng-show="sidebar.hidden">
   <span class="ed-btn"
         ng-click="sidebar.toggleVisible()"
-        data-trigger="hover"
+        data-trigger="{{tooltip.show?'hover':'manual'}}"
         data-placement="right"
         data-container="body"
-        data-title="{{!tooltip.show ? '' : 'ShowSidebar'|translate}}"
+        data-title="{{'ShowSidebar'|translate}}"
         bs-tooltip>
-    <i class="fa fa-angle-right"></i>
+    <i class="fa"></i>
   </span>
 </div>
 <div class="pillbox-container">
   <div class="zoom-container">
-    <div ng-click="zooms.zoomIn()"
-         data-trigger="hover"
+    <div ng-click="zooms.expand=!zooms.expand"
+         ng-hide="zooms.expand"
+         data-trigger="{{tooltip.show?'hover':'manual'}}"
          data-placement="left"
          data-container="body"
-         data-title="{{!tooltip.show ? '' : 'ZoomIn'|translate}}"
+         data-title="{{'ShowNavigators'|translate}}"
+         bs-tooltip>
+      <i class="fa fa-arrows"></i>
+    </div>
+    <div ng-show="zooms.expand"
+         ng-click="zooms.expand=!zooms.expand"
+         data-trigger="{{tooltip.show?'hover':'manual'}}"
+         data-placement="left"
+         data-container="body"
+         data-delay="200"
+         data-title="{{'HideNavigators'|translate}}"
+         bs-tooltip>
+      <i class="fa fa-times"></i>
+    </div>
+    <div ng-show="zooms.expand"
+         ng-click="zooms.zoomIn()"
+         data-trigger="{{tooltip.show?'hover':'manual'}}"
+         data-placement="left"
+         data-container="body"
+         data-delay="200"
+         data-title="{{'ZoomIn'|translate}}"
          bs-tooltip>
       <i class="fa fa-plus"></i>
     </div>
-    <div ng-click="zooms.zoomOut()"
-         data-trigger="hover"
+    <div ng-show="zooms.expand"
+         ng-click="zooms.zoomOut()"
+         data-trigger="{{tooltip.show?'hover':'manual'}}"
          data-placement="left"
          data-container="body"
-         data-title="{{!tooltip.show ? '' : 'ZoomOut'|translate}}"
+         data-delay="200"
+         data-title="{{'ZoomOut'|translate}}"
          bs-tooltip>
       <i class="fa fa-minus"></i>
     </div>
-    <div ng-click="zooms.zoomDefault()"
-         data-trigger="hover"
+    <div ng-show="zooms.expand"
+         ng-click="zooms.zoomDefault()"
+         data-trigger="{{tooltip.show?'hover':'manual'}}"
          data-placement="left"
          data-container="body"
-         data-title="{{!tooltip.show ? '' : 'ZoomDefault'|translate}}"
+         data-delay="200"
+         data-title="{{'ZoomDefault'|translate}}"
          bs-tooltip>
       <i class="fa fa-home"></i>
+    </div>
+  </div>
+  <div class="zoom-container" ng-show="zooms.expand">
+    <div ng-click="zooms.clickDownArrow()"
+         data-trigger="{{tooltip.show?'hover':'manual'}}"
+         data-placement="left"
+         data-container="body"
+         data-delay="200"
+         data-title="{{'PanUp'|translate}}"
+         bs-tooltip>
+      <i class="fa fa-arrow-up"></i>
+    </div>
+    <div ng-click="zooms.clickUpArrow()"
+         data-trigger="{{tooltip.show?'hover':'manual'}}"
+         data-placement="left"
+         data-container="body"
+         data-delay="200"
+         data-title="{{'PanDown'|translate}}"
+         bs-tooltip>
+      <i class="fa fa-arrow-down"></i>
+    </div>
+    <div ng-click="zooms.clickLeftArrow()"
+         data-trigger="{{tooltip.show?'hover':'manual'}}"
+         data-placement="left"
+         data-container="body"
+         data-delay="200"
+         data-title="{{'PanLeft'|translate}}"
+         bs-tooltip>
+      <i class="fa fa-arrow-left"></i>
+    </div>
+    <div ng-click="zooms.clickRightArrow()"
+         data-trigger="{{tooltip.show?'hover':'manual'}}"
+         data-placement="left"
+         data-container="body"
+         data-delay="200"
+         data-title="{{'PanRight'|translate}}"
+         bs-tooltip>
+      <i class="fa fa-arrow-right"></i>
     </div>
   </div>
 </div>

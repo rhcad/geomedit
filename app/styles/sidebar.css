@@ -1,0 +1,142 @@
+#sidebar {
+  width: 220px;
+  height: 100%;
+  float: left;
+  border-right: 1px solid #ddd;
+  -webkit-box-shadow: 1px 2px 2px #ddd;
+  -moz-box-shadow: 1px 2px 2px #ddd;
+  box-shadow: 1px 2px 2px #ddd;
+}
+
+#board {
+  margin-left: 220px;
+  height: 100%;
+}
+
+#sidebar-list {
+  position: absolute;
+  top: 40px;
+  bottom: 0;
+  width: 220px;
+}
+
+#show-sidebar {
+  top: 0;
+  left: 0;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-radius: 0 0 4px 0;
+}
+
+#show-sidebar i:before {
+  content: "\f101";
+}
+
+#hide-sidebar i:before {
+  content: "\f100";
+}
+
+@media (max-width: 480px) and (orientation: portrait) {
+  #sidebar {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    height: 220px;
+    border-top: 1px solid #ddd;
+    -webkit-box-shadow: 0 -1px 1px #ddd;
+    -moz-box-shadow: 0 -1px 1px #ddd;
+    box-shadow: 0 -1px 1px #ddd;
+  }
+
+  #board {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    bottom: 220px;
+    margin-left: 0;
+    height: auto;
+  }
+
+  #sidebar-list {
+    position: absolute;
+    top: 40px;
+    bottom: 0;
+    width: 100%;
+  }
+
+  #show-sidebar {
+    top: auto;
+    left: auto;
+    right: 0;
+    bottom: 0;
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    border-right: none;
+    border-bottom: none;
+    border-radius: 4px 0 0 0;
+  }
+
+  #show-sidebar i:before {
+    content: "\f102";
+  }
+
+  #hide-sidebar i:before {
+    content: "\f103";
+  }
+}
+
+#cmd-ctx-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 34px;
+  text-align: center;
+  padding: 4px;
+  z-index: 20;
+  font-size: 12px;
+}
+
+#cmd-ctx-bar > div {
+  padding: 4px 8px;
+  display: inline-block;
+  border: 1px solid #777;
+  border-radius: 4px;
+  background: rgba(240, 240, 240, 0.8);
+}
+
+#cmd-ctx-bar > div i:before {
+  content: "\f05a";
+}
+
+#cmd-ctx-bar input {
+  width: 55px;
+  text-align: center;
+}
+
+@media screen and (min-width: 460px) {
+  #cmd-ctx-bar {
+    bottom: auto;
+    top: -35px;
+    left: 90px;
+    right: 84px;
+    padding: 0;
+    color: #ccc;
+    overflow: hidden;
+    font-size: 14px;
+  }
+
+  #cmd-ctx-bar > div {
+    border: none;
+    background: none;
+  }
+
+  #cmd-ctx-bar input {
+    border: 1px solid #888;
+    background: none;
+    width: 60px;
+  }
+
+  #cmd-ctx-bar > div i:before {
+    content: "";
+  }
+}

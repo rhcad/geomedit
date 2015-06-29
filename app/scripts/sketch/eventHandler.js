@@ -1,9 +1,8 @@
 // Copyright (c) 2015 Zhang Yungui (https://github.com/rhcad/geomedit/), GPL licensed.
 
-'use strict';
-
 angular.module('geomeditApp')
-  .service('eventHandler', ['board', 'options', 'motion', function(bd, options, motion) {
+  .service('eventHandler', ['model', 'motion', function(model, motion) {
+    'use strict';
     var downEvent, upEvent, moveEvent;
     this.touchMode = false;
     this.customDownHandlers = [];
@@ -43,90 +42,92 @@ angular.module('geomeditApp')
         this.addMouseHandlers();
         this.addTouchHandlers();
       }
-      JXG.addEvent(bd.board.containerObj, downEvent, this.downEventHandler, this);
-      JXG.addEvent(bd.board.containerObj, moveEvent, this.moveEventHandler, this);
-      JXG.addEvent(bd.board.containerObj, upEvent, this.upEventHandler, this);
+      JXG.addEvent(model.board.containerObj, downEvent, this.downEventHandler, this);
+      JXG.addEvent(model.board.containerObj, moveEvent, this.moveEventHandler, this);
+      JXG.addEvent(model.board.containerObj, upEvent, this.upEventHandler, this);
     };
 
     this.unregisterHandlers = function() {
       this.removePointerHandlers();
       this.removeMouseHandlers();
       this.removeTouchHandlers();
-      JXG.removeEvent(bd.board.containerObj, downEvent, this.downEventHandler, this);
-      JXG.removeEvent(bd.board.containerObj, moveEvent, this.moveEventHandler, this);
-      JXG.removeEvent(bd.board.containerObj, upEvent, this.upEventHandler, this);
+      JXG.removeEvent(model.board.containerObj, downEvent, this.downEventHandler, this);
+      JXG.removeEvent(model.board.containerObj, moveEvent, this.moveEventHandler, this);
+      JXG.removeEvent(model.board.containerObj, upEvent, this.upEventHandler, this);
       motion.clear();
     };
 
-    function preventDefault(e) { e.preventDefault(); }
+    function preventDefault(e) {
+      e.preventDefault();
+    }
 
     this.addPointerHandlers = function() {
-      if (!bd.board.hasPointerHandlers && JXG.isBrowser) {
-        JXG.addEvent(bd.board.containerObj, moveEvent, bd.board.pointerMoveListener, bd.board);
+      if (!model.board.hasPointerHandlers && JXG.isBrowser) {
+        JXG.addEvent(model.board.containerObj, moveEvent, model.board.pointerMoveListener, model.board);
 
-        bd.board.containerObj.addEventListener('MSHoldVisual', preventDefault, false);
-        bd.board.containerObj.addEventListener('contextmenu', preventDefault, false);
-        bd.board.containerObj.addEventListener('selectstart', preventDefault, false);
+        model.board.containerObj.addEventListener('MSHoldVisual', preventDefault, false);
+        model.board.containerObj.addEventListener('contextmenu', preventDefault, false);
+        model.board.containerObj.addEventListener('selectstart', preventDefault, false);
 
         this.jxgDownHandler = function() {
-          return bd.board.pointerDownListener.apply(bd.board, arguments);
+          return model.board.pointerDownListener.apply(model.board, arguments);
         };
-        bd.board.hasPointerHandlers = true;
+        model.board.hasPointerHandlers = true;
         this.touchMode = true;
       }
     };
 
     this.addMouseHandlers = function() {
-      if (!bd.board.hasMouseHandlers && JXG.isBrowser) {
-        JXG.addEvent(bd.board.containerObj, 'mousemove', bd.board.mouseMoveListener, bd.board);
-        bd.board.containerObj.addEventListener('contextmenu', preventDefault, false);
+      if (!model.board.hasMouseHandlers && JXG.isBrowser) {
+        JXG.addEvent(model.board.containerObj, 'mousemove', model.board.mouseMoveListener, model.board);
+        model.board.containerObj.addEventListener('contextmenu', preventDefault, false);
 
         this.jxgDownHandler = function() {
-          bd.board.mouseDownListener.apply(bd.board, arguments);
+          model.board.mouseDownListener.apply(model.board, arguments);
         };
-        bd.board.hasMouseHandlers = true;
+        model.board.hasMouseHandlers = true;
       }
     };
 
     this.addTouchHandlers = function() {
-      if (!bd.board.hasTouchHandlers && JXG.isBrowser) {
-        JXG.addEvent(bd.board.containerObj, 'touchmove', bd.board.touchMoveListener, bd.board);
-        bd.board.hasTouchHandlers = true;
+      if (!model.board.hasTouchHandlers && JXG.isBrowser) {
+        JXG.addEvent(model.board.containerObj, 'touchmove', model.board.touchMoveListener, model.board);
+        model.board.hasTouchHandlers = true;
       }
     };
 
     this.removePointerHandlers = function() {
-      if (bd.board.hasPointerHandlers) {
-        JXG.removeEvent(bd.board.containerObj, moveEvent, bd.board.pointerMoveListener, bd.board);
-        bd.board.containerObj.removeEventListener('MSHoldVisual', preventDefault, false);
-        bd.board.containerObj.removeEventListener('contextmenu', preventDefault, false);
-        bd.board.containerObj.removeEventListener('selectstart', preventDefault, false);
-        bd.board.hasPointerHandlers = false;
+      if (model.board.hasPointerHandlers) {
+        JXG.removeEvent(model.board.containerObj, moveEvent, model.board.pointerMoveListener, model.board);
+        model.board.containerObj.removeEventListener('MSHoldVisual', preventDefault, false);
+        model.board.containerObj.removeEventListener('contextmenu', preventDefault, false);
+        model.board.containerObj.removeEventListener('selectstart', preventDefault, false);
+        model.board.hasPointerHandlers = false;
       }
     };
 
     this.removeMouseHandlers = function() {
-      if (bd.board.hasMouseHandlers) {
-        JXG.removeEvent(bd.board.containerObj, 'mousemove', bd.board.mouseMoveListener, bd.board);
-        bd.board.containerObj.removeEventListener('contextmenu', preventDefault, false);
-        bd.board.hasMouseHandlers = false;
+      if (model.board.hasMouseHandlers) {
+        JXG.removeEvent(model.board.containerObj, 'mousemove', model.board.mouseMoveListener, model.board);
+        model.board.containerObj.removeEventListener('contextmenu', preventDefault, false);
+        model.board.hasMouseHandlers = false;
       }
     };
 
     this.removeTouchHandlers = function() {
-      if (bd.board.hasTouchHandlers) {
-        JXG.removeEvent(bd.board.containerObj, 'touchmove', bd.board.touchMoveListener, bd.board);
-        bd.board.hasTouchHandlers = false;
+      if (model.board.hasTouchHandlers) {
+        JXG.removeEvent(model.board.containerObj, 'touchmove', model.board.touchMoveListener, model.board);
+        model.board.hasTouchHandlers = false;
       }
     };
 
     this.downEventHandler = function(e) {
-      if (bd.board.hasMouseHandlers && e[JXG.touchProperty]) {
+      if (model.board.hasMouseHandlers && e[JXG.touchProperty]) {
         this.removeMouseHandlers();
         this.jxgDownHandler = function() {
-          bd.board.touchStartListener.apply(bd.board, arguments);
+          model.board.touchStartListener.apply(model.board, arguments);
         };
-        bd.board.hasMouseHandlers = false;
+        model.board.hasMouseHandlers = false;
         this.touchMode = true;
       }
 
@@ -134,15 +135,16 @@ angular.module('geomeditApp')
       motion.updateStartCoords(e);
       motion.dragging = true;
 
-      if (bd.command) {
-        (bd.command.downHandler || angular.noop)();
-        bd.board.update();
+      if (model.command) {
+        (model.command.downHandler || angular.noop)();
+        model.board.update();
       }
-      else if (options.draggable) {
+      else if (model.draggable) {
         (this.jxgDownHandler || angular.noop)(e);
       }
 
-      angular.element('body').click();  // Call $tooltip.hide()
+      // Call $tooltip.hide() via click
+      angular.element('body').click();
       this.customDownHandlers.forEach(function(handler) {
         handler(e);
       });
@@ -150,10 +152,10 @@ angular.module('geomeditApp')
 
     function updatePrecision(touchMode) {
       if (touchMode) {
-        bd.board.options.precision.hasPoint = bd.board.options.precision.touch;
+        model.board.options.precision.hasPoint = model.board.options.precision.touch;
       }
-      else if (options.snap.project) {
-        bd.board.options.precision.hasPoint = bd.board.options.precision.touch / 2;
+      else if (model.snap.project) {
+        model.board.options.precision.hasPoint = model.board.options.precision.touch / 2;
       }
     }
 
@@ -166,14 +168,14 @@ angular.module('geomeditApp')
           handler(e);
         });
 
-        if (bd.command) {
-          if (bd.command.moveHandler) {
-            bd.command.moveHandler();
+        if (model.command) {
+          if (model.command.moveHandler) {
+            model.command.moveHandler();
           }
           else if (motion.hasDraftCoords()) {
             motion.updateDraftCoords();
           }
-          bd.board.update();
+          model.board.update();
           motion.lastPt = motion.pt;
         }
       }
@@ -183,9 +185,12 @@ angular.module('geomeditApp')
       if (motion.dragging) {
         motion.updateCoords(e);
         motion.dragging = false;
-        if (bd.command) {
-          (bd.command.upHandler || angular.noop)();
-          bd.board.update();
+        if (model.command) {
+          (model.command.upHandler || angular.noop)();
+          if (motion.hasDraftCoords() && !motion.lastDraftCoordsIsNew() && model.command.clickHandler) {
+            model.command.clickHandler();
+          }
+          model.board.update();
         }
       }
     };

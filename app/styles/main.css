@@ -3,6 +3,10 @@
   font-size: 20px;
 }
 
+a[href*="cnzz.com"] {
+  display: none;
+}
+
 body {
   -webkit-font-smoothing: antialiased;
 }
@@ -64,16 +68,6 @@ body {
   width: 100%;
 }
 
-#sidebar {
-  width: 210px;
-  height: 100%;
-  float: left;
-  border-right: 1px solid #ddd;
-  -webkit-box-shadow: 1px 2px 2px #ddd;
-  -moz-box-shadow: 1px 2px 2px #ddd;
-  box-shadow: 1px 2px 2px #ddd;
-}
-
 #sidebar-nav {
   height: 40px;
   line-height: 40px;
@@ -116,11 +110,6 @@ body {
   color: #000;
 }
 
-#board {
-  margin-left: 210px;
-  height: 100%;
-}
-
 #board div {
   user-select: none;
   -webkit-user-select: none;
@@ -141,24 +130,12 @@ body {
   width: 40px;
   height: 40px;
   line-height: 40px;
-  border-radius: 0 4px 4px 0;
   text-align: center;
   font-size: 16px;
   color: #666;
 }
 
-#show-sidebar {
-  top: 0;
-  left: 0;
-  border-right: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-}
-
 #sidebar-list {
-  position: absolute;
-  top: 40px;
-  bottom: 0;
-  width: 210px;
   overflow: auto;
 }
 
@@ -254,17 +231,31 @@ div button.pull-right {
 }
 
 .toolbox-titlebar {
-  height: 26px;
-  line-height: 26px;
+  height: 30px;
+  line-height: 30px;
 }
 
-.toolbox-titlebar > :last-child {
+.toolbox-titlebar > :nth-child(n+2) {
   float: right;
   width: 16px;
 }
 
 .toolbox-titlebar:hover {
   background-color: #eee;
+}
+
+.toolbox-group li > a {
+  padding-right: 8px;
+}
+
+.toolbox-group li > a > i {
+  float: right;
+  height: 20px;
+  line-height: 20px;
+}
+
+.toolbox-group span + span {
+  margin-left: 8px;
 }
 
 .prop-item {
@@ -323,7 +314,7 @@ div button.pull-right {
 }
 
 .prop-item input[ng-switch-when=xy] {
-  width: 54px;
+  width: 48px;
 }
 
 .color-box {
@@ -457,10 +448,15 @@ input[type=range]:focus::-ms-fill-upper {
 
 .pillbox-container {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 0;
+  right: 0;
   bottom: 0;
   width: 0;
+  text-align: center;
+  color: #666;
+  font-size: 16px;
+  text-shadow: 0 1px #fff;
+  z-index: 19;
 }
 
 .zoom-container {
@@ -468,20 +464,21 @@ input[type=range]:focus::-ms-fill-upper {
   -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.15);
   box-shadow: 0 0 5px rgba(0,0,0,0.15);
   border: 1px solid #ddd;
-  background: #f0f0f0;
-  -webkit-border-radius: 6px;
-  border-radius: 6px;
+  background: rgba(240, 240, 240, 0.93);
+  -webkit-border-radius: 6px 0 0 6px;
+  border-radius: 6px 0 0 6px;
   width: 37px;
   margin-bottom: 6px;
-  text-align: center;
-  color: #666;
-  font-size: 16px;
-  text-shadow: 0 1px #fff;
+}
+
+.pillbox-container > :first-child {
+  -webkit-border-radius: 0 0 0 6px;
+  border-radius: 0 0 0 6px;
 }
 
 .zoom-container > div {
-  height: 35px;
-  line-height: 35px;
+  height: 34px;
+  line-height: 34px;
 }
 
 .zoom-container > div.active,
