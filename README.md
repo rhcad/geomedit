@@ -16,7 +16,7 @@ An online dynamic geometry editor based on AngularJS and JSXGraph.
  - [x] Snapping points such as vertex, glider, intersection and midpoint.
  - [x] Snapping parallel and perpendicular lines.
  - [x] Draw vector shapes interactively.
- - [x] Show context tip and widget for interactive tools.
+ - [x] Show context tips and widgets for interactive tools.
  - [x] Show and edit properties of various shapes.
  - [ ] Load and save.
  - [ ] Undo and redo.

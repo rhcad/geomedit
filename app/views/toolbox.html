@@ -9,7 +9,7 @@
             ng-click="toolbox.cancel(); $event.stopPropagation();">
         <i class="fa fa-times"
            data-trigger="{{tooltip.show?'hover':'manual'}}" data-container="body" bs-tooltip
-           data-title="{{'CancelCmd'|translate}}"></i>
+           data-title="{{!tooltip.show?'': 'CancelCmd'|translate}}"></i>
       </span>
     </div>
     <ul class="nav" ng-show="toolbox.expand === group.name">
@@ -18,7 +18,7 @@
           {{'Cmd_'+tool|camelCase|translate}}
           <i ng-if="tool === toolbox.active()" class="fa fa-times"
              data-trigger="{{tooltip.show?'hover':'manual'}}" data-container="body" bs-tooltip
-             data-title="{{'CancelCmd'|translate}}"></i>
+             data-title="{{!tooltip.show?'': 'CancelCmd'|translate}}"></i>
         </a>
       </li>
     </ul>

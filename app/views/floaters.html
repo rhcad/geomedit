@@ -4,7 +4,7 @@
         data-trigger="{{tooltip.show?'hover':'manual'}}"
         data-placement="right"
         data-container="body"
-        data-title="{{'ShowSidebar'|translate}}"
+        data-title="{{!tooltip.show?'': 'ShowSidebar'|translate}}"
         bs-tooltip>
     <i class="fa"></i>
   </span>
@@ -16,7 +16,7 @@
          data-trigger="{{tooltip.show?'hover':'manual'}}"
          data-placement="left"
          data-container="body"
-         data-title="{{'ShowNavigators'|translate}}"
+         data-title="{{!tooltip.show?'': 'ShowNavigators'|translate}}"
          bs-tooltip>
       <i class="fa fa-arrows"></i>
     </div>
@@ -26,7 +26,7 @@
          data-placement="left"
          data-container="body"
          data-delay="200"
-         data-title="{{'HideNavigators'|translate}}"
+         data-title="{{!tooltip.show?'': 'HideNavigators'|translate}}"
          bs-tooltip>
       <i class="fa fa-times"></i>
     </div>
@@ -36,7 +36,7 @@
          data-placement="left"
          data-container="body"
          data-delay="200"
-         data-title="{{'ZoomIn'|translate}}"
+         data-title="{{!tooltip.show?'': 'ZoomIn'|translate}}"
          bs-tooltip>
       <i class="fa fa-plus"></i>
     </div>
@@ -46,7 +46,7 @@
          data-placement="left"
          data-container="body"
          data-delay="200"
-         data-title="{{'ZoomOut'|translate}}"
+         data-title="{{!tooltip.show?'': 'ZoomOut'|translate}}"
          bs-tooltip>
       <i class="fa fa-minus"></i>
     </div>
@@ -56,7 +56,7 @@
          data-placement="left"
          data-container="body"
          data-delay="200"
-         data-title="{{'ZoomDefault'|translate}}"
+         data-title="{{!tooltip.show?'': 'ZoomDefault'|translate}}"
          bs-tooltip>
       <i class="fa fa-home"></i>
     </div>
@@ -67,7 +67,7 @@
          data-placement="left"
          data-container="body"
          data-delay="200"
-         data-title="{{'PanUp'|translate}}"
+         data-title="{{!tooltip.show?'': 'PanUp'|translate}}"
          bs-tooltip>
       <i class="fa fa-arrow-up"></i>
     </div>
@@ -76,7 +76,7 @@
          data-placement="left"
          data-container="body"
          data-delay="200"
-         data-title="{{'PanDown'|translate}}"
+         data-title="{{!tooltip.show?'': 'PanDown'|translate}}"
          bs-tooltip>
       <i class="fa fa-arrow-down"></i>
     </div>
@@ -85,7 +85,7 @@
          data-placement="left"
          data-container="body"
          data-delay="200"
-         data-title="{{'PanLeft'|translate}}"
+         data-title="{{!tooltip.show?'': 'PanLeft'|translate}}"
          bs-tooltip>
       <i class="fa fa-arrow-left"></i>
     </div>
@@ -94,7 +94,7 @@
          data-placement="left"
          data-container="body"
          data-delay="200"
-         data-title="{{'PanRight'|translate}}"
+         data-title="{{!tooltip.show?'': 'PanRight'|translate}}"
          bs-tooltip>
       <i class="fa fa-arrow-right"></i>
     </div>

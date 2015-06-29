@@ -5,7 +5,7 @@
         ng-class="{active: sidebar.state === v.state}"
         data-trigger="{{tooltip.show?'hover':'manual'}}"
         data-placement="bottom"
-        data-title="{{(v.state|camelCase|translate)}}"
+        data-title="{{!tooltip.show?'': (v.state|camelCase|translate)}}"
         bs-tooltip>
     <i class="fa fa-{{v.icon}}"></i>
   </span>
@@ -13,7 +13,7 @@
         ng-click="sidebar.toggleVisible()"
         data-trigger="{{tooltip.show?'hover':'manual'}}"
         data-placement="bottom"
-        data-title="{{'HideSidebar'|translate}}"
+        data-title="{{!tooltip.show?'': 'HideSidebar'|translate}}"
         bs-tooltip>
     <i class="fa"></i>
   </span>

@@ -6,14 +6,14 @@
     <button type="button" class="btn btn-link prop-btn-s" ng-click="clearSelection()"
             data-trigger="{{tooltip.show?'hover':'manual'}}"
             data-container="body"
-            data-title="{{'ShowAllObjects'|translate}}"
+            data-title="{{!tooltip.show?'': 'ShowAllObjects'|translate}}"
             bs-tooltip>
       <i class="fa fa-list"></i>
     </button>
     <button type="button" class="btn btn-link prop-btn-s" ng-click="switchVisible()" ng-show="info().elType"
             data-trigger="{{tooltip.show?'hover':'manual'}}"
             data-container="body"
-            data-title="{{info().visible ? 'HideObject' : 'ShowObject' |translate}}"
+            data-title="{{!tooltip.show?'': info().visible ? 'HideObject' : 'ShowObject' |translate}}"
             bs-tooltip>
       <i class="fa fa-{{info().visible ? 'eye' : 'eye-slash'}}"></i>
     </button>
@@ -39,7 +39,7 @@
             ng-model="prop.value.zoom" bs-checkbox
             data-trigger="{{tooltip.show?'hover':'manual'}}"
             data-container="body"
-            data-title="{{'PropZoomSize'|translate}}"
+            data-title="{{!tooltip.show?'': 'PropZoomSize'|translate}}"
             bs-tooltip>
       <i class="fa fa-search-plus"></i>
     </button>
@@ -49,7 +49,7 @@
     <button ng-switch-when="label" type="button" class="btn btn-default prop-btn-s"
             ng-model="prop.value.withLabel" bs-checkbox
             data-trigger="{{tooltip.show?'hover':'manual'}}"
-            data-title="{{prop.value.withLabel ? 'HideLabel' : 'ShowLabel' |translate}}"
+            data-title="{{!tooltip.show?'': prop.value.withLabel ? 'HideLabel' : 'ShowLabel' |translate}}"
             bs-tooltip>
       <i class="fa fa-{{prop.value.withLabel ? 'eye' : 'eye-slash'}}"></i>
     </button>
@@ -68,7 +68,7 @@
             ng-model="prop.value.snapToGrid" bs-checkbox
             data-trigger="{{tooltip.show?'hover':'manual'}}"
             data-container="body"
-            data-title="{{'PropSnapToGrid'|translate}}"
+            data-title="{{!tooltip.show?'': 'PropSnapToGrid'|translate}}"
             bs-tooltip>
       <i class="fa fa-building-o"></i>
     </button>
@@ -77,7 +77,7 @@
             ng-class="{disabled: prop.value.readonly}"
             data-trigger="{{tooltip.show?'hover':'manual'}}"
             data-container="body"
-            data-title="{{'PropSnapToPoints'|translate}}"
+            data-title="{{!tooltip.show?'': 'PropSnapToPoints'|translate}}"
             bs-tooltip>
       <i class="fa fa-magnet"></i>
     </button>
@@ -88,7 +88,7 @@
           ng-click="prop.expand=!prop.expand"
           data-trigger="{{tooltip.show?'hover':'manual'}}"
           data-container="body"
-          data-title="{{prop.expand ? 'PropHideColor' : 'PropExpandColor'|translate}}"
+          data-title="{{!tooltip.show?'': prop.expand ? 'PropHideColor' : 'PropExpandColor'|translate}}"
           bs-tooltip>
       <i class="fa fa-{{prop.expand ? 'angle-up' : 'angle-down'}}"></i>
     </span>
@@ -121,17 +121,17 @@
   <div ng-switch-when="lineEndings">
     <span></span>
     <button type="button" class="btn btn-default" ng-model="prop.value.arrowLast" bs-checkbox
-            data-trigger="{{tooltip.show?'hover':'manual'}}" data-container="body" data-title="{{'ArrowLast'|translate}}" bs-tooltip>
+            data-trigger="{{tooltip.show?'hover':'manual'}}" data-container="body" data-title="{{!tooltip.show?'': 'ArrowLast'|translate}}" bs-tooltip>
       <i class="fa fa-arrow-right"></i>
     </button>
     <button type="button" class="btn btn-default" ng-model="prop.value.arrowFirst" bs-checkbox
-            data-trigger="{{tooltip.show?'hover':'manual'}}" data-container="body" data-title="{{'ArrowFirst'|translate}}" bs-tooltip>
+            data-trigger="{{tooltip.show?'hover':'manual'}}" data-container="body" data-title="{{!tooltip.show?'': 'ArrowFirst'|translate}}" bs-tooltip>
       <i class="fa fa-arrow-left"></i>
     </button>
     <button type="button" class="btn btn-default" ng-model="prop.value.restrictLast" bs-checkbox
-            data-trigger="{{tooltip.show?'hover':'manual'}}" data-container="body" data-title="{{'RestrictLast'|translate}}" bs-tooltip>┥</button>
+            data-trigger="{{tooltip.show?'hover':'manual'}}" data-container="body" data-title="{{!tooltip.show?'': 'RestrictLast'|translate}}" bs-tooltip>┥</button>
     <button type="button" class="btn btn-default" ng-model="prop.value.restrictFirst" bs-checkbox
-            data-trigger="{{tooltip.show?'hover':'manual'}}" data-container="body" data-title="{{'RestrictFirst'|translate}}" bs-tooltip>┝</button>
+            data-trigger="{{tooltip.show?'hover':'manual'}}" data-container="body" data-title="{{!tooltip.show?'': 'RestrictFirst'|translate}}" bs-tooltip>┝</button>
   </div>
 
   <div ng-switch-when="color" ng-hide="!prop.expand">
@@ -150,7 +150,7 @@
     <button type="button" class="btn btn-default prop-btn-s"
             ng-click="recreateBoard()"
             data-trigger="{{tooltip.show?'hover':'manual'}}"
-            data-title="{{'RecreateBoard'|translate}}"
+            data-title="{{!tooltip.show?'': 'RecreateBoard'|translate}}"
             bs-tooltip>
       <i class="fa fa-trash-o"></i>
     </button>
