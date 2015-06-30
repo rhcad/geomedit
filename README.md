@@ -2,7 +2,7 @@
 
 An online dynamic geometry editor based on AngularJS and JSXGraph.
 
-[View online demos](http://rhcad.com/#/sketch).
+[View online demos](http://rhcad.com/geometry).
 
 ![](doc/main.png)
 

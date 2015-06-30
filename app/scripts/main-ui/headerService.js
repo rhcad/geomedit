@@ -37,7 +37,6 @@ angular.module('geomeditApp')
           click: function(scope) { scope.showOptionsPopover(); }
         };
 
-    this.homeBtn = { tooltip: 'Home', icon: 'home' };
     this.leftButtons = [undoBtn, redoBtn];
-    this.rightButtons = [optionsBtn, this.homeBtn];
+    this.rightButtons = [optionsBtn];
   }]);

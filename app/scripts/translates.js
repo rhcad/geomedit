@@ -14,11 +14,6 @@ angular.module('geomeditApp')
         'SnapGlider':  'Snap to edge',
         'ProjectMode': 'Large screen projection',
 
-        'ProjectName': 'Geometry Online',
-        'ProjectDesc': 'Dynamic Mathematics with JSXGraph',
-        'Blog':        'Blog',
-        'StartSketch': 'Start for sketch',
-
         'Loading':          'Loading...',
         'Cmd_':             'Select',
         'CmdPoint':         'Point',
@@ -165,8 +160,7 @@ angular.module('geomeditApp')
         'RecreateBoard':  'Reset',
         'Undo':           'Undo',
         'Redo':           'Redo',
-        'Options':        'Options',
-        'Home':           'Home'
+        'Options':        'Options'
       })
       .translations('cn', {
         'Languages':   '界面语言',
@@ -177,11 +171,6 @@ angular.module('geomeditApp')
         'SnapCross':   '捕捉新的交点',
         'SnapGlider':  '允许捕捉线上点',
         'ProjectMode': '大屏投影模式',
-
-        'ProjectName': '几何绘图',
-        'ProjectDesc': '基于 JSXGraph 的在线动态几何编辑平台',
-        'Blog':        '博客',
-        'StartSketch': '开始绘图',
 
         'Loading':          '正在加载...',
         'Cmd_':             '选择',
@@ -333,8 +322,7 @@ angular.module('geomeditApp')
         'RecreateBoard':  '重置',
         'Undo':           '撤销',
         'Redo':           '重做',
-        'Options':        '选项',
-        'Home':           '首页'
+        'Options':        '选项'
       })
       .preferredLanguage(lang && lang.toLowerCase().indexOf('cn') >= 0 ? 'cn' : 'en')
       .useSanitizeValueStrategy(null);

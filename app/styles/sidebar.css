@@ -113,12 +113,12 @@
   text-align: center;
 }
 
-@media screen and (min-width: 460px) {
+@media screen and (min-width: 420px) {
   #cmd-ctx-bar {
     bottom: auto;
     top: -35px;
     left: 90px;
-    right: 84px;
+    right: 44px;
     padding: 0;
     color: #ccc;
     overflow: hidden;

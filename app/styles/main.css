@@ -3,7 +3,8 @@
   font-size: 20px;
 }
 
-a[href*="cnzz.com"] {
+a[href*="cnzz.com"],
+a[href*="clustrmaps.com"] {
   display: none;
 }
 
@@ -137,6 +138,16 @@ body {
 
 #sidebar-list {
   overflow: auto;
+}
+
+.sidebar-footer {
+  margin: 16px 8px 8px 8px;
+  color: #ccc;
+}
+
+.sidebar-footer a,
+.sidebar-footer a:visited {
+  color: #ccc;
 }
 
 .nav > li.active {

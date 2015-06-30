@@ -20,18 +20,17 @@
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
-    <link rel="stylesheet" href="styles/home.css">
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/sidebar.css">
     <!-- endbuild -->
   </head>
-  <body ng-app="geomeditApp" ng-controller="RootCtrl">
+  <body ng-app="geomeditApp">
     <!--[if lt IE 9]>
       <p class="browse-happy">你的 IE 浏览器版本太低，请 <a href="http://browsehappy.com/">升级或更换浏览器</a> 后再访问本站。
       <br>You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-    <div ui-view></div>
+    <div ng-controller="MainCtrl" ng-include="'views/sketch.html'"></div>
 
     <!-- build:js(.) scripts/angular.js -->
     <!-- bower:js -->
@@ -60,7 +59,6 @@
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/app.js"></script>
     <script src="scripts/translates.js"></script>
-    <script src="scripts/rootController.js"></script>
     <script src="scripts/model/modelFactory.js"></script>
     <script src="scripts/main-ui/mainController.js"></script>
     <script src="scripts/main-ui/headerService.js"></script>
