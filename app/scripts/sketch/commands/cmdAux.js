@@ -92,8 +92,9 @@ angular.module('geomeditApp')
         if (!motion.hasDraftCoords()) {
           motion.addDraftCoords();
           motion.addDraftCoords(p.snapMasks);
-          var el = model.create('segment', motion.createDraftPoints(0, 1), { strokeWidth: 1, dash: 2 });
-          model.drafts.push(p.afterCreated(el));
+          var recorder = motion.recordObjects();
+          p.afterCreated(model.create('segment', motion.createDraftPoints(0, 1), { strokeWidth: 1, dash: 2 }));
+          recorder.addTo(model.drafts);
         }
         else {
           motion.updateDraftCoords();
@@ -129,12 +130,18 @@ angular.module('geomeditApp')
     this.addLineCommand = function(p) {
       checkParams(p);
 
+      function verifyParents(points) {
+        return JXG.isFunction(p.verifyParents) ? p.verifyParents(points) : points;
+      }
+
       function downHandler() {
         if (!motion.hasDraftCoords()) {
           motion.addDraftCoords();
           motion.addDraftCoords();
-          var el = model.create(p.type, motion.createDraftPoints(0, 1), p.attr);
-          model.drafts.push(p.afterCreated(el));
+          var points = motion.createDraftPoints(0, 1),
+              recorder = motion.recordObjects();
+          p.afterCreated(model.create(p.type, verifyParents(points), p.attr));
+          recorder.addTo(model.drafts)
         }
         else {
           motion.updateDraftCoords();
@@ -148,7 +155,7 @@ angular.module('geomeditApp')
           motion.submit(function() {
             var p1 = motion.createPoint(0, true, p.attrP1),
                 p2 = motion.createPoint(1, true, p.attrP2);
-            return p.afterCreated(model.create(p.type, [p1, p2], p.attr));
+            return p.afterCreated(model.create(p.type, verifyParents([p1, p2]), p.attr));
           });
         }
         else {
@@ -208,7 +215,9 @@ angular.module('geomeditApp')
         }
         else if (count < 3 && motion.lastDraftCoordsIsNew()) {
           motion.addDraftCoords();
-          model.drafts.push(p.afterCreated(model.create(p.type, points), points));
+          var recorder = motion.recordObjects();
+          p.afterCreated(model.create(p.type, points), points);
+          recorder.addTo(model.drafts);
         }
         else {
           motion.updateDraftCoords();

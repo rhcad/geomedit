@@ -37,6 +37,7 @@ angular.module('geomeditApp')
         'CmdCircle2p':      'Circle with center',
         'CmdCircle3p':      'Circle through 3 points',
         'CmdInCircle':      'Inscribed circle',
+        'CmdRegularPolygon': 'Regular polygon',
 
         'TipPoint':           'Click or drag to a position',
         'TipMidpoint':        'Click or drag around a segment',
@@ -61,6 +62,9 @@ angular.module('geomeditApp')
         'TipCircle2p':        'Click or drag from the center',
         'TipDragToRadius':    'Drag to a position on circle',
         'TipClkDragToRadius': 'Click or drag to a position on circle',
+        'TipClkDragStartR':   'Click or drag from a vertex position',
+        'TipDragToEndR':      'Drag to the adjacent vertex position',
+        'TipClkDragToEndR':   'Click or drag to the adjacent vertex position',
 
         'SelectShape':       'Please select a shape.',
         'SelectOption':      'Select',
@@ -133,6 +137,7 @@ angular.module('geomeditApp')
         'PropTicksDistances': 'Ticks dist',
         'PropMajorHeight':    'Infinite tick line',
         'PropMinorTicks':     'Minor ticks count',
+        'PropEdges':          'Edges',
 
         'ShowSidebar':    'Show sidebar',
         'HideSidebar':    'Hide sidebar',
@@ -199,6 +204,7 @@ angular.module('geomeditApp')
         'CmdCircle2p':      '圆心圆',
         'CmdCircle3p':      '过三点画圆',
         'CmdInCircle':      '三点内切圆',
+        'CmdRegularPolygon': '正多边形',
 
         'TipPoint':           '点击或拖动到一个位置',
         'TipMidpoint':        '在线段附近点击或拖动',
@@ -223,6 +229,9 @@ angular.module('geomeditApp')
         'TipCircle2p':        '点击圆心位置或从该点拖动',
         'TipDragToRadius':    '拖动到一点确定半径',
         'TipClkDragToRadius': '点击或拖动到圆周上的位置',
+        'TipClkDragStartR':   '点击一个顶点位置或从该点拖动',
+        'TipDragToEndR':      '拖动到相邻顶点的位置',
+        'TipClkDragToEndR':   '点击相邻顶点的位置或从该点拖动',
 
         'SelectShape':       '请选择一个图形',
         'SelectOption':      '选择',
@@ -295,6 +304,7 @@ angular.module('geomeditApp')
         'PropTicksDistances': '刻度线距离',
         'PropMajorHeight':    '主刻度线延长',
         'PropMinorTicks':     '小刻度数',
+        'PropEdges':          '边数',
 
         'ShowSidebar':    '展开操作面板',
         'HideSidebar':    '收起操作面板',

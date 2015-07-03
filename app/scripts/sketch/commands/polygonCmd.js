@@ -7,6 +7,7 @@ angular.module('geomeditApp')
     var tip3p = cmdAux.generateTip(['TipClkDragFromPt', 'TipClkDragToP2', 'TipDragToP2', 'TipClkDragToEnd', 'TipDragToEnd']),
         tip4p = cmdAux.generateTip(['TipClkDragFromPt', 'TipClkDragToP2', 'TipDragToP2',
           'TipClkDragToP3', 'TipDragToP3', 'TipClkDragToEnd', 'TipDragToEnd']),
+        regularTip = cmdAux.generateTip(['TipClkDragStartR', 'TipDragToEndR', 'TipClkDragToEndR']),
         tips = ['TipClkDragStart', 'TipClkDragToP2', 'TipDragToP2',
           'TipClkDragToP3', 'TipDragToP3', 'TipClkDragToPn', 'TipDragToPn'];
 
@@ -15,7 +16,7 @@ angular.module('geomeditApp')
     cmdAux.addCommand3p({ group: 'polygon', id: 'parallelogram', type: 'parallelpoint', tip: tip3p,
       afterCreated: function(pt, points) {
         pt.setAttribute({ visible: false });
-        return [pt, model.create('polygon', [points[0], points[1], pt, points[2]])];
+        model.create('polygon', [points[0], points[1], pt, points[2]]);
       }
     });
 
@@ -35,6 +36,16 @@ angular.module('geomeditApp')
           return tips[step];
         }
         return tips[step % 2 ? 5 : 6];
+      }
+    });
+
+    cmdAux.addLineCommand({ group: 'polygon', id: 'regularPolygon', type: 'regularPolygon', tip: regularTip,
+      inited: function() {
+        model.context.input = { title: 'edges', min: 3, max: 300, value: 3 };
+      },
+      verifyParents: function(points) {
+        var edges = model.context.input.value || 3;
+        return points.concat([Math.max(3, edges)]);
       }
     });
 

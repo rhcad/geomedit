@@ -6,14 +6,14 @@
   <div id="cmd-ctx-bar">
     <div ng-controller="CmdContextCtrl" ng-show="context.tip">
       <span><i class="fa"></i> {{context.tip|camelCase|translate}}</span>
-      <input type="number" ng-if="context.input"
-             ng-model="context.input.value"
-             ng-hide="context.input.hide()"
-             ng-change="context.input.changed(context.input.value)"
-             placeholder="{{(context.input.title && ('Prop_'+context.input.title))|camelCase|translate}}"
-             min="{{context.input.min||0}}"
-             max="{{context.input.max||1000}}"
-             step="{{context.input.step||1}}"/>
+      <div class="context-input" ng-if="context.input" ng-hide="context.input.hide()">
+        <span>{{(context.input.title && ('Prop_'+context.input.title))|camelCase|translate}}:</span>
+        <input type="number" ng-model="context.input.value"
+               ng-change="context.input.changed(context.input.value)"
+               min="{{context.input.min||0}}"
+               max="{{context.input.max||1000}}"
+               step="{{context.input.step||1}}"/>
+      </div>
     </div>
   </div>
 </div>

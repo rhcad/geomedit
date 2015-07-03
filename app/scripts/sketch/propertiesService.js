@@ -91,7 +91,7 @@ angular.module('geomeditApp')
 
         keys.forEach(function(key) {
           item = creators[key];
-          if (!JXG.isFalse(item && item.get && item.get())) {
+          if (item && !JXG.isFalse(item.get && item.get())) {
             item.oldValue = JXG.isObject(item.value) ? JXG.deepCopy({}, item.value) : item.value;
             item.id = key;
             items.push(item);

@@ -154,35 +154,40 @@ angular.module('geomeditApp')
       return ret;
     };
 
-    this.submit = function(creation) {
-      var self = this, sp,
-          hasPendings = function(el) {
-            return model.pendings.indexOf(el) < 0;
-          },
-          addPending = function(sp) {
-            if (JXG.isArray(sp)) {
-              sp.forEach(function(el) {
-                if (hasPendings(el)) {
-                  model.pendings.push(el);
-                }
-                model.propObj = el;
-              });
-            }
-            else {
-              if (hasPendings(sp)) {
-                model.pendings.push(sp);
+    this.recordObjects = function() {
+      return {
+        oldList: model.board.objectsList.slice(0),
+        getNewObjects: function() {
+          var self = this;
+          return model.board.objectsList.filter(function(el) {
+            return self.oldList.indexOf(el) < 0;
+          });
+        },
+        addTo: function(dest, src) {
+          var ret;
+          src = src || this.getNewObjects();
+          if (src) {
+            src.forEach(function(el) {
+              if (dest.indexOf(el) < 0) {
+                dest.push(el);
+                ret = el;
               }
-              model.propObj = sp;
-            }
-          };
+            });
+          }
+          return ret;
+        }
+      };
+    };
+
+    this.submit = function(creation) {
+      var self = this,
+          recorder = this.recordObjects();
 
       try {
         self.clearDrafts();
         model.pendings = [];
-        sp = creation();
-        if (sp) {
-          addPending(sp);
-        }
+        creation();
+        model.propObj = recorder.addTo(model.pendings);
       } catch (e) {
         while (model.pendings.length > 0) {
           model.board.removeObject(model.pendings.pop());

@@ -109,7 +109,7 @@
 }
 
 #cmd-ctx-bar input {
-  width: 55px;
+  width: 54px;
   text-align: center;
 }
 
@@ -133,10 +133,13 @@
   #cmd-ctx-bar input {
     border: 1px solid #888;
     background: none;
-    width: 60px;
   }
 
   #cmd-ctx-bar > div i:before {
     content: "";
+  }
+
+  .context-input {
+    display: inline-block;
   }
 }

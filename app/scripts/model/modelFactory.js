@@ -83,8 +83,14 @@ angular.module('geomeditApp')
         polygon: {
           hasInnerPoints: true
         },
-        regularPolygon: {
-          hasInnerPoints: true
+        regularpolygon: {
+          hasInnerPoints: true,
+          vertices: {
+            withLabel: false,
+            face: '[]',
+            fillColor: '#00dd00',
+            strokeColor: '#00dd00'
+          }
         }
       },
       uiOptions: {
