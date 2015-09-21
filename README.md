@@ -33,5 +33,6 @@ This project is licensed under [GPL v3](http://www.gnu.org/licenses/gpl-3.0.html
 
 ## Further reading
 
-- [Debug with the unminified version of JSXGraph library](doc/build_jxg.md) (Run `test/jxg.sh`)
+- [Debug with the unminified version of JSXGraph library](doc/build_jxg.md) (Run `doc/jxg.sh`)
 - [JSXGraph Homepage](http://jsxgraph.uni-bayreuth.de/wp/)
+- [JSXGraph GUI](http://eudzbenici.rs.ba/svn.eudzbenici.rs.ba/GUI/)
